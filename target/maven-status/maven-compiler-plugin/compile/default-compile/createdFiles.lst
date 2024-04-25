@@ -1,0 +1,5 @@
+com\example\model\Doctor.class
+com\example\model\Person.class
+com\example\model\Patient.class
+com\example\dao\PatientDAO.class
+com\example\resource\PatientResource.class
