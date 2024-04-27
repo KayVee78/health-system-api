@@ -30,8 +30,25 @@ public class PatientDAO {
                 + "Surgical History: Knee replacement surgery at age 60\n",
                 "Critical"));
     }
-    
+
     public List<Patient> getAllPatients() {
         return patients;
+    }
+
+    public void deletePatient(int id) {
+        patients.removeIf(patient -> patient.getId() == id);
+    }
+
+    //HELPER METHODS
+    public Patient findPatientById(int id) {
+        Patient patientFound = null;
+        for (Patient patient : patients) {
+            if (patient.getId() == id) {
+                patientFound = patient;
+                break;
+            }
+        }
+
+        return patientFound;
     }
 }
