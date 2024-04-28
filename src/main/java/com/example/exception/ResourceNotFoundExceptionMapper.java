@@ -22,19 +22,23 @@ import org.slf4j.LoggerFactory;
 public class ResourceNotFoundExceptionMapper implements
         ExceptionMapper<ResourceNotFoundException> {
 
-//    private static final Logger LOGGER
-//            = Logger.getLogger(ResourceNotFoundExceptionMapper.class.getName());
     private static final Logger LOGGER = LoggerFactory.getLogger(ResourceNotFoundExceptionMapper.class);
 
     @Override
     public Response toResponse(ResourceNotFoundException exception) {
-//        LOGGER.log(Level.ALL.SEVERE, "ResourceNotFoundException caught: {}"
-//                + exception.getMessage(), exception);
         LOGGER.error("ResourceNotFoundException caught: {}",
                 exception.getMessage(), exception);
+        String responseJson = "{"
+                + "\"status\": fail,"
+                + "\"message\": \"" + exception.getMessage() + "\","
+                + "\"data\": {}"
+                + "}";
+
+        // Return the response
         return Response.status(Response.Status.NOT_FOUND)
-                .entity(exception.getMessage())
-                .type(MediaType.TEXT_PLAIN)
+                .entity(responseJson)
+                .type(MediaType.APPLICATION_JSON)
                 .build();
+
     }
 }
