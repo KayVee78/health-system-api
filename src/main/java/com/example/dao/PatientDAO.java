@@ -39,6 +39,22 @@ public class PatientDAO {
         patients.removeIf(patient -> patient.getId() == id);
     }
 
+    public void addPatient(Patient patient) {
+        int newUserId = getNextUserId();
+        patient.setId(newUserId);
+        patients.add(patient);
+    }
+
+    public void updatePatient(Patient updatePatient) {
+        for (int i = 0; i < patients.size(); i++) {
+            Patient patient = patients.get(i);
+            if (patient.getId() == updatePatient.getId()) {
+                patients.set(i, updatePatient);
+                return;
+            }
+        }
+    }
+
     //HELPER METHODS
     public Patient findPatientById(int id) {
         Patient patientFound = null;
@@ -48,7 +64,22 @@ public class PatientDAO {
                 break;
             }
         }
-
         return patientFound;
+    }
+
+    public int getNextUserId() {
+        //Initialize the maxUserId with a value lower than any possible userId
+        int maxUserId = Integer.MIN_VALUE;
+
+        //Iterage through the list and finding the maximum userId
+        for (Patient patient : patients) {
+            int userId = patient.getId();
+            if (userId > maxUserId) {
+                maxUserId = userId;
+            }
+        }
+
+        //Increment the mxUserId to get the next available userId
+        return maxUserId + 1;
     }
 }
