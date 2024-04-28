@@ -12,9 +12,12 @@ import com.example.result.ResultData;
 import com.example.result.ResultWithNoData;
 
 import java.util.List;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -45,16 +48,74 @@ public class PatientResource {
             LOGGER.info("{} patients fetched", patients.size());
 
             if (patients.isEmpty()) {
-                LOGGER.warn("No patients found!");
                 throw new ResourceNotFoundException("No patients found!");
             } else {
                 return new ResultData<>(patients, "Patients fetched successfully!", "success");
             }
         } catch (InternalServerErrorException e) {
-            LOGGER.error("Internal Server Error occured", e.getMessage());
             throw new InternalServerErrorException("Internal Server Error occured");
         }
 
+    }
+
+    @GET
+    @Path("/{patientId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResultData<Patient> getPatientById(@PathParam("patientId") int patientId) {
+        try {
+            LOGGER.info("Getting patient by id: {}", patientId);
+            Patient patient = patientDAO.findPatientById(patientId);
+            if (patient != null) {
+                LOGGER.info("Patient with ID {} fetched successfully!", patientId);
+                return new ResultData<>(patient, "Patients with " + patientId + " fetched successfully!", "success");
+            } else {
+                throw new ResourceNotFoundException("Patient with ID " + patientId + " not found!");
+            }
+        } catch (InternalServerErrorException e) {
+            throw new InternalServerErrorException("Internal Server Error occured");
+        }
+
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResultWithNoData addPatient(Patient patient) {
+        try {
+            List<Patient> patients = patientDAO.getAllPatients();
+            int prevPatientListSize = patients.size();
+            patientDAO.addPatient(patient);
+            if (patients.size() > prevPatientListSize) {
+                LOGGER.info("New patient added successfully!");
+                return new ResultWithNoData("New patient added successfully!", "success");
+            } else {
+                throw new ResourceNotFoundException("Failed to add a new patient!");
+            }
+
+        } catch (InternalServerErrorException e) {
+            throw new InternalServerErrorException("Internal Server Error occured");
+        }
+    }
+
+    @PUT
+    @Path("/{patientId}")
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResultWithNoData updatePatient(@PathParam("patientId") int patientId, Patient updatePatient) {
+        try {
+            Patient existingPatient = patientDAO.findPatientById(patientId);
+
+            if (existingPatient != null) {
+                updatePatient.setId(patientId);
+                patientDAO.updatePatient(updatePatient);
+                LOGGER.info("Patient with ID {} updated successfully!", patientId);
+                return new ResultWithNoData("Patient with ID " + patientId + " updated successfully!", "success");
+            } else {
+                throw new ResourceNotFoundException("Patient with ID " + patientId + " not found!");
+            }
+        } catch (InternalServerErrorException e) {
+            throw new InternalServerErrorException("Internal Server Error occured");
+        }
     }
 
     @DELETE
@@ -64,16 +125,15 @@ public class PatientResource {
         try {
             Patient patient = patientDAO.findPatientById(patientId);
             if (patient != null) {
-                LOGGER.info("Patient with ID {} removed successfully!", patientId);
                 patientDAO.deletePatient(patientId);
+                LOGGER.info("Patient with ID {} removed successfully!", patientId);
+
                 return new ResultWithNoData("Patient with ID " + patientId + " removed successfully!", "success");
             } else {
-                LOGGER.warn("Patient with ID " + patientId + " not found!");
                 throw new ResourceNotFoundException("Patient with ID " + patientId + " not found!");
             }
 
         } catch (InternalServerErrorException e) {
-            LOGGER.error("Internal Server Error occured", e.getMessage());
             throw new InternalServerErrorException("Internal Server Error occured");
         }
     }
