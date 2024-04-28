@@ -6,13 +6,15 @@ package com.example.resource;
 
 import com.example.dao.PatientDAO;
 import com.example.exception.ResourceNotFoundException;
+import com.example.exception.InternalServerErrorException;
 import com.example.model.Patient;
+import com.example.result.ResultData;
+import com.example.result.ResultWithNoData;
 
 import java.util.List;
 import javax.ws.rs.DELETE;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.InternalServerErrorException;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -34,7 +36,8 @@ public class PatientResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public List<Patient> getAllPatients() {
+    public ResultData<List<Patient>> getAllPatients() {
+
         try {
             LOGGER.info("Fetching all the patients");
 
@@ -42,36 +45,37 @@ public class PatientResource {
             LOGGER.info("{} patients fetched", patients.size());
 
             if (patients.isEmpty()) {
+                LOGGER.warn("No patients found!");
                 throw new ResourceNotFoundException("No patients found!");
+            } else {
+                return new ResultData<>(patients, "Patients fetched successfully!", "success");
             }
-            return patients;
-        } catch (ResourceNotFoundException e) {
-            LOGGER.warn("No patients found!");
-            throw e;
-        } catch (Exception e) {
+        } catch (InternalServerErrorException e) {
             LOGGER.error("Internal Server Error occured", e.getMessage());
-            throw new InternalServerErrorException("Internal Server Error occurred");
+            throw new InternalServerErrorException("Internal Server Error occured");
         }
+
     }
 
     @DELETE
+    @Produces(MediaType.APPLICATION_JSON)
     @Path("/{patientId}")
-    public String deletePatient(@PathParam("patientId") int patientId) {
+    public ResultWithNoData deletePatient(@PathParam("patientId") int patientId) {
         try {
             Patient patient = patientDAO.findPatientById(patientId);
             if (patient != null) {
                 LOGGER.info("Patient with ID {} removed successfully!", patientId);
                 patientDAO.deletePatient(patientId);
-                return "Patient with ID " + patientId + " removed successfully!";
+                return new ResultWithNoData("Patient with ID " + patientId + " removed successfully!", "success");
             } else {
+                LOGGER.warn("Patient with ID " + patientId + " not found!");
                 throw new ResourceNotFoundException("Patient with ID " + patientId + " not found!");
             }
-        } catch (ResourceNotFoundException e) {
-            LOGGER.warn("Patient with ID {} not found!", patientId);
-            throw e;
-        } catch (Exception e) {
+
+        } catch (InternalServerErrorException e) {
             LOGGER.error("Internal Server Error occured", e.getMessage());
-            throw new InternalServerErrorException("Internal Server Error occurred");
+            throw new InternalServerErrorException("Internal Server Error occured");
         }
     }
+
 }
