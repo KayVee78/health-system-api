@@ -13,23 +13,23 @@ import java.util.List;
  */
 public class Patient extends Person {
 
-    private String medicalHistory;
+    private PatientMedicalHistory medicalHistory;
     private String currentHealthStatus;
 
     public Patient() {
     }
 
-    public Patient(int id, String name, String contactInfo, String address, String medicalHistory, String currentHealthStatus) {
+    public Patient(int id, String name, String contactInfo, String address, PatientMedicalHistory medicalHistory, String currentHealthStatus) {
         super(id, name, contactInfo, address);
         this.medicalHistory = medicalHistory;
         this.currentHealthStatus = currentHealthStatus;
     }
 
-    public String getMedicalHistory() {
+    public PatientMedicalHistory getMedicalHistory() {
         return medicalHistory;
     }
 
-    public void setMedicalHistory(String medicalHistory) {
+    public void setMedicalHistory(PatientMedicalHistory medicalHistory) {
         this.medicalHistory = medicalHistory;
     }
 

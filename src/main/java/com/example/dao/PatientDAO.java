@@ -4,9 +4,14 @@
  */
 package com.example.dao;
 
+import com.example.exception.ResourceNotFoundException;
 import com.example.model.Patient;
+import com.example.model.PatientMedicalHistory;
+import com.example.resource.PatientResource;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -15,19 +20,12 @@ import java.util.List;
 public class PatientDAO {
 
     private static List<Patient> patients = new ArrayList<>();
+    private static final Logger LOGGER = LoggerFactory.getLogger(PatientDAO.class);
 
     static {
-        patients.add(new Patient(1, "Ashan Dias", "0772572800", "Kalutara", "Age: 45\n"
-                + "Diagnosis: Hypertension\n"
-                + "Medications: For 1 month\n"
-                + "Allergies: None\n"
-                + "Surgical History: None\n",
+        patients.add(new Patient(1, "Ashan Dias", "0772572800", "Kalutara", new PatientMedicalHistory(45, "Hypertension", "For 1 month", "None", "None"),
                 "Recovering"));
-        patients.add(new Patient(2, "Janaka Fernando", "0712359807", "Colombo-03", "Age: 62\n"
-                + "Diagnosis: Type 2 Diabetes\n"
-                + "Medications: For 8 years\n"
-                + "Allergies: Penicillin\n"
-                + "Surgical History: Knee replacement surgery at age 60\n",
+        patients.add(new Patient(2, "Janaka Fernando", "0712359807", "Colombo-03", new PatientMedicalHistory(62, "Type 2 Diabetes", "For 8 years", "Penicillin", "Knee replacement surgery at age 60"),
                 "Critical"));
     }
 
@@ -40,9 +38,14 @@ public class PatientDAO {
     }
 
     public void addPatient(Patient patient) {
-        int newUserId = getNextUserId();
-        patient.setId(newUserId);
-        patients.add(patient);
+        if (patient.getName() != null && patient.getAddress() != null && patient.getContactInfo() != null && patient.getMedicalHistory() != null && patient.getCurrentHealthStatus() != null) {
+            int newUserId = getNextUserId();
+            patient.setId(newUserId);
+            patients.add(patient);
+        } else {
+            LOGGER.error("Missing mandatory field(s) in patient data. Failed to add a new Patient!.");
+        }
+
     }
 
     public void updatePatient(Patient updatePatient) {
