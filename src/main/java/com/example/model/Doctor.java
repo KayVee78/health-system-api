@@ -11,13 +11,15 @@ package com.example.model;
 public class Doctor extends Person {
 
     private String specialization;
+    private double doctorFee;
 
     public Doctor() {
     }
 
-    public Doctor(int id, String name, String contactInfo, String address, String specialization) {
+    public Doctor(int id, String name, String contactInfo, String address, String specialization, double doctorFee) {
         super(id, name, contactInfo, address);
         this.specialization = specialization;
+        this.doctorFee = doctorFee;
     }
 
     public String getSpecialization() {
@@ -35,4 +37,13 @@ public class Doctor extends Person {
     public void setId(int id) {
         this.id = id;
     }
+
+    public double getDoctorFee() {
+        return doctorFee;
+    }
+
+    public void setDoctorFee(double doctorFee) {
+        this.doctorFee = doctorFee;
+    }
+    
 }
