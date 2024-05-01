@@ -4,6 +4,7 @@
  */
 package com.example.dao;
 
+import com.example.exception.ResourceNotFoundException;
 import com.example.model.Doctor;
 import com.example.resource.DoctorResource;
 import java.util.ArrayList;
@@ -39,7 +40,8 @@ public class DoctorDAO {
             doctor.setId(newUserId);
             doctors.add(doctor);
         } else {
-            LOGGER.error("Missing mandatory field(s) in doctor data. Failed to add a new Doctor!.");
+            LOGGER.error("Missing mandatory field(s) in doctor data. Failed to add a new Doctor!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in doctor data. Failed to add a new Doctor!");
         }
 
     }

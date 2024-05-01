@@ -105,7 +105,8 @@ public class AppointmentDAO {
 
             return;
         } else {
-            LOGGER.error("Missing mandatory field(s) in appointment data. Failed to add a new Appointment!.");
+            LOGGER.error("Missing mandatory field(s) in appointment data. Failed to add a new Appointment!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in appointment data. Failed to add a new Appointment!");
         }
 
     }

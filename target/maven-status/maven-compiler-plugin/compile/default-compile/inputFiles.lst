@@ -2,7 +2,9 @@ E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessm
 E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\resource\AppointmentResource.java
 E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\dao\DoctorDAO.java
 E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\resource\DoctorResource.java
+E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\resource\PersonResource.java
 E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\model\Person.java
+E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\dao\PersonDAO.java
 E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\result\ResultWithNoData.java
 E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\exception\InternalServerErrorException.java
 E:\University\WESTMINSTER\Year 2\Client-Server Architectures (5COSC022C)\Assessments\CourseWork\HealthSystemAPI\src\main\java\com\example\model\Patient.java
