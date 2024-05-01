@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PatientDAO {
 
-    private static List<Patient> patients = new ArrayList<>();
+    public static List<Patient> patients = new ArrayList<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientDAO.class);
 
     static {

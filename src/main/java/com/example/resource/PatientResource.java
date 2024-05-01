@@ -69,7 +69,7 @@ public class PatientResource {
                 LOGGER.info("Patient with ID {} fetched successfully!", patientId);
                 return new ResultData<>(patient, "Patients with " + patientId + " fetched successfully!", "success");
             } else {
-                throw new ResourceNotFoundException("Patient with ID " + patientId + " not found!");
+                throw new ResourceNotFoundException("No patient found with ID: " + patientId);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -111,7 +111,7 @@ public class PatientResource {
                 LOGGER.info("Patient with ID {} updated successfully!", patientId);
                 return new ResultWithNoData("Patient with ID " + patientId + " updated successfully!", "success");
             } else {
-                throw new ResourceNotFoundException("Patient with ID " + patientId + " not found!");
+                throw new ResourceNotFoundException("No patient found with ID: " + patientId);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -130,7 +130,7 @@ public class PatientResource {
 
                 return new ResultWithNoData("Patient with ID " + patientId + " removed successfully!", "success");
             } else {
-                throw new ResourceNotFoundException("Patient with ID " + patientId + " not found!");
+                throw new ResourceNotFoundException("No patient found with ID: " + patientId);
             }
 
         } catch (InternalServerErrorException e) {
