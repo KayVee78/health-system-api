@@ -18,18 +18,18 @@ public class Appointment {
     private String doctorId;
     private String date; //year-month-date format
     private String time; //24 hour format
-    private List<String> asscoiatedPatients;
+    private List<String> associatedParticipants;
 
     public Appointment() {
     }
 
-    public Appointment(int appointmentId, String patientId, String doctorId, String date, String time, List<String> asscoiatedPatients) {
+    public Appointment(int appointmentId, String patientId, String doctorId, String date, String time, List<String> associatedParticipants) {
         this.appointmentId = appointmentId;
         this.patientId = patientId;
         this.doctorId = doctorId;
         this.date = date;
         this.time = time;
-        this.asscoiatedPatients = asscoiatedPatients;
+        this.associatedParticipants = associatedParticipants;
     }
 
     public int getAppointmentId() {
@@ -72,12 +72,12 @@ public class Appointment {
         this.time = time;
     }
 
-    public List<String> getAsscoiatedPatients() {
-        return asscoiatedPatients;
+    public List<String> getassociatedParticipants() {
+        return associatedParticipants;
     }
 
-    public void setAsscoiatedPatients(List<String> asscoiatedPatients) {
-        this.asscoiatedPatients = asscoiatedPatients;
+    public void setassociatedParticipants(List<String> associatedParticipants) {
+        this.associatedParticipants = associatedParticipants;
     }
 
 }
