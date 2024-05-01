@@ -43,7 +43,8 @@ public class PatientDAO {
             patient.setId(newUserId);
             patients.add(patient);
         } else {
-            LOGGER.error("Missing mandatory field(s) in patient data. Failed to add a new Patient!.");
+            LOGGER.error("Missing mandatory field(s) in patient data. Failed to add a new Patient!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in patient data. Failed to add a new Patient!");
         }
 
     }
