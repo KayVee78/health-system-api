@@ -5,10 +5,11 @@
 package com.example.dao;
 
 import com.example.exception.ResourceNotFoundException;
+import com.example.model.MedicalRecord;
 import com.example.model.Patient;
 import com.example.model.PatientMedicalHistory;
-import com.example.resource.PatientResource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +24,14 @@ public class PatientDAO {
     private static final Logger LOGGER = LoggerFactory.getLogger(PatientDAO.class);
 
     static {
-        patients.add(new Patient(1, "Ashan Dias", "0772572800", "Kalutara", new PatientMedicalHistory(45, "Hypertension", "For 1 month", "None", "None"),
-                "Recovering"));
-        patients.add(new Patient(2, "Janaka Fernando", "0712359807", "Colombo-03", new PatientMedicalHistory(62, "Type 2 Diabetes", "For 8 years", "Penicillin", "Knee replacement surgery at age 60"),
-                "Critical"));
+        patients.add(new Patient(1, "Ashan Dias", "0772572800", "Kalutara", 40, List.of(
+                "Medical Conditions: Type 2 Diabetes (diagnosed at age 35)",
+                "Allergies: None",
+                "Surgeries: None",
+                "Medications: Metformin (500mg, twice daily)"
+        ), "Controlled"));
+        patients.add(new Patient(2, "Janaka Fernando", "0712359807", "Colombo-03", 46, List.of("Medical Conditions: Coronary artery disease (diagnosed at age 42)", "Allergies: None", "Surgeries: Coronary Artery Bypass Graft", "Medications: Medications: Aspirin (daily), Statin (daily)"), "Recovering"));
+
     }
 
     public List<Patient> getAllPatients() {

@@ -38,17 +38,14 @@ public class AppointmentDAO {
                 int doctorId = Integer.parseInt(appointment.getDoctorId());
                 Doctor doctor = doctorDAO.findDoctorById(doctorId);
                 if (doctor != null) {
-                    String doctorDetails = doctor.getName() + " (" + doctor.getSpecialization() + ")";
-
+                    String doctorDetails = String.format("Dr.%s (%s Specialist)", doctor.getName(), doctor.getSpecialization());
                     int patientId = Integer.parseInt(appointment.getPatientId());
                     Patient patient = patientDAO.findPatientById(patientId);
                     if (patient != null) {
-                        String patientDetails = String.format("%s (%s) - %d years - %s Patient",
+                        String patientDetails = String.format("%s (%s) - %d years old",
                                 patient.getName(),
                                 patient.getContactInfo(),
-                                patient.getMedicalHistory().getAge(),
-                                patient.getMedicalHistory().getDiagnosis());
-
+                                patient.getAge());
                         String date = appointment.getDate();
                         String time = appointment.getTime();
                         List<String> associatedParticipants = appointment.getassociatedParticipants();
@@ -90,7 +87,7 @@ public class AppointmentDAO {
             }
 
             if (!isValidDoctorId && !isValidPatientId) {
-                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with ID the " + appointment.getPatientId() + " and no doctor found with ID the " + appointment.getPatientId());
+                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with the ID " + appointment.getPatientId() + " and no doctor found with the ID " + appointment.getPatientId());
             }
             if (!isValidPatientId) {
                 throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with ID: " + appointment.getPatientId());
@@ -129,7 +126,7 @@ public class AppointmentDAO {
         }
 
         if (!isValidDoctorId && !isValidPatientId) {
-            throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with ID the " + updateAppointment.getPatientId() + " and no doctor found with ID the " + updateAppointment.getPatientId());
+            throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with the ID " + updateAppointment.getPatientId() + " and no doctor found with the ID " + updateAppointment.getPatientId());
         }
         if (!isValidPatientId) {
             throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with ID: " + updateAppointment.getPatientId());
@@ -159,16 +156,15 @@ public class AppointmentDAO {
                 int doctorId = Integer.parseInt(appointment.getDoctorId());
                 Doctor doctor = doctorDAO.findDoctorById(doctorId);
                 if (doctor != null) {
-                    String doctorDetails = doctor.getName() + " (" + doctor.getSpecialization() + ")";
+                    String doctorDetails = String.format("Dr.%s (%s Specialist)", doctor.getName(), doctor.getSpecialization());
 
                     int patientId = Integer.parseInt(appointment.getPatientId());
                     Patient patient = patientDAO.findPatientById(patientId);
                     if (patient != null) {
-                        String patientDetails = String.format("%s (%s) - %d years - %s Patient",
+                        String patientDetails = String.format("%s (%s) - %d years old",
                                 patient.getName(),
                                 patient.getContactInfo(),
-                                patient.getMedicalHistory().getAge(),
-                                patient.getMedicalHistory().getDiagnosis());
+                                patient.getAge());
 
                         String date = appointment.getDate();
                         String time = appointment.getTime();

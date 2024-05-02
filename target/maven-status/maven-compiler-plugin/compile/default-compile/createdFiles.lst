@@ -2,6 +2,7 @@ com\example\model\Doctor.class
 com\example\model\Person.class
 com\example\result\ResultData.class
 com\example\result\ResultWithNoData.class
+com\example\resource\MedicalRecordResource.class
 com\example\dao\DoctorDAO.class
 com\example\model\Appointment.class
 com\example\model\Patient.class
@@ -14,6 +15,8 @@ com\example\dao\PersonDAO.class
 com\example\dao\PatientDAO.class
 com\example\exception\InternalServerErrorException.class
 com\example\exception\ResourceNotFoundException.class
+com\example\model\MedicalRecord.class
+com\example\dao\MedicalRecordDAO.class
 com\example\exception\ResourceNotFoundExceptionMapper.class
 com\example\resource\DoctorResource.class
 com\example\resource\PatientResource.class

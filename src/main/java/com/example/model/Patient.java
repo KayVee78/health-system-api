@@ -13,23 +13,25 @@ import java.util.List;
  */
 public class Patient extends Person {
 
-    private PatientMedicalHistory medicalHistory;
+    private int age;
+    private List<String> medicalHistory;
     private String currentHealthStatus;
 
     public Patient() {
     }
 
-    public Patient(int id, String name, String contactInfo, String address, PatientMedicalHistory medicalHistory, String currentHealthStatus) {
+    public Patient(int id, String name, String contactInfo, String address, int age, List<String> medicalHistory, String currentHealthStatus) {
         super(id, name, contactInfo, address);
+        this.age = age;
         this.medicalHistory = medicalHistory;
         this.currentHealthStatus = currentHealthStatus;
     }
 
-    public PatientMedicalHistory getMedicalHistory() {
+    public List<String> getMedicalHistory() {
         return medicalHistory;
     }
 
-    public void setMedicalHistory(PatientMedicalHistory medicalHistory) {
+    public void setMedicalHistory(List<String> medicalHistory) {
         this.medicalHistory = medicalHistory;
     }
 
@@ -48,4 +50,13 @@ public class Patient extends Person {
     public void setId(int id) {
         this.id = id;
     }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
 }
