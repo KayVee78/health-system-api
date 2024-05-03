@@ -11,7 +11,7 @@ package com.example.model;
 public class MedicalRecord {
 
     private int recordId;
-    private int patientId;
+    private String patientId;
     private String reasonToVisit;
     private String diagnosis;
     private String medications;
@@ -20,7 +20,7 @@ public class MedicalRecord {
     public MedicalRecord() {
     }
 
-    public MedicalRecord(int recordId, int patientId, String reasonToVisit, String diagnosis, String medications, String allergies) {
+    public MedicalRecord(int recordId, String patientId, String reasonToVisit, String diagnosis, String medications, String allergies) {
         this.recordId = recordId;
         this.patientId = patientId;
         this.reasonToVisit = reasonToVisit;
@@ -37,11 +37,11 @@ public class MedicalRecord {
         this.recordId = recordId;
     }
 
-    public int getPatientId() {
+    public String getPatientId() {
         return patientId;
     }
 
-    public void setPatientId(int patientId) {
+    public void setPatientId(String patientId) {
         this.patientId = patientId;
     }
 
