@@ -64,7 +64,7 @@ public class MedicalRecordResource {
     public ResultData<MedicalRecord> getMedicalRecordById(@PathParam("medicalRecordId") int medicalRecordId) {
         try {
             LOGGER.info("Getting medical record by id: {}", medicalRecordId);
-            MedicalRecord medicalRecord = medicalRecordDAO.findMedicalRecordById(medicalRecordId);
+            MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordById(medicalRecordId);
             if (medicalRecord != null) {
                 LOGGER.info("Medical record with ID {} fetched successfully!", medicalRecordId);
                 return new ResultData<>(medicalRecord, "Medical records with " + medicalRecordId + " fetched successfully!", "success");
@@ -89,7 +89,7 @@ public class MedicalRecordResource {
                     LOGGER.info("Medical record with ID {} fetched successfully!", patientId);
                     return new ResultData<>(medicalRecord, "Medical records with " + patientId + " fetched successfully!", "success");
                 } else {
-                    throw new ResourceNotFoundException("No medical record found with ID: " + patientId);
+                    throw new ResourceNotFoundException("No medical record found with patient ID: " + patientId);
                 }
             } else {
                 throw new ResourceNotFoundException("Invalid patient ID: " + patientId);
@@ -109,6 +109,7 @@ public class MedicalRecordResource {
             List<MedicalRecord> medicalRecords = medicalRecordDAO.getAllMedicalRecords();
             int prevMedicalRecordListSize = medicalRecords.size();
             medicalRecordDAO.addMedicalRecord(medicalRecord);
+            medicalRecords = medicalRecordDAO.getAllMedicalRecords();
             if (medicalRecords.size() > prevMedicalRecordListSize) {
                 LOGGER.info("New medical record added successfully!");
                 return new ResultWithNoData("New medical record added successfully!", "success");

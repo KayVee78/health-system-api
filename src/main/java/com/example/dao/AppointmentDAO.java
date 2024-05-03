@@ -38,11 +38,12 @@ public class AppointmentDAO {
                 int doctorId = Integer.parseInt(appointment.getDoctorId());
                 Doctor doctor = doctorDAO.findDoctorById(doctorId);
                 if (doctor != null) {
-                    String doctorDetails = String.format("Dr.%s (%s Specialist)", doctor.getName(), doctor.getSpecialization());
+                    String doctorDetails = String.format("(%d) Dr.%s (%s Specialist)", doctorId, doctor.getName(), doctor.getSpecialization());
                     int patientId = Integer.parseInt(appointment.getPatientId());
                     Patient patient = patientDAO.findPatientById(patientId);
                     if (patient != null) {
-                        String patientDetails = String.format("%s (%s) - %d years old",
+                        String patientDetails = String.format("(%d) %s (%s) - %d years old",
+                                patientId,
                                 patient.getName(),
                                 patient.getContactInfo(),
                                 patient.getAge());
@@ -70,6 +71,9 @@ public class AppointmentDAO {
 
     public void addAppointment(Appointment appointment) {
         if (appointment.getPatientId() != null && appointment.getDoctorId() != null && appointment.getDate() != null && appointment.getTime() != null) {
+            if (!isNumeric(appointment.getPatientId()) || !isNumeric(appointment.getDoctorId())) {
+                throw new ResourceNotFoundException("Patient/Doctor ID must be numeric. Failed to add a new medical record!");
+            }
             boolean isValidPatientId = false;
             boolean isValidDoctorId = false;
             for (Patient patient : PatientDAO.patients) {
@@ -109,6 +113,9 @@ public class AppointmentDAO {
     }
 
     public void updateAppointmentData(Appointment updateAppointment) {
+        if (!isNumeric(updateAppointment.getPatientId()) || !isNumeric(updateAppointment.getDoctorId())) {
+            throw new ResourceNotFoundException("Patient/Doctor ID must be numeric. Failed to add a new medical record!");
+        }
         boolean isValidPatientId = false;
         boolean isValidDoctorId = false;
         for (Patient patient : PatientDAO.patients) {
@@ -156,12 +163,13 @@ public class AppointmentDAO {
                 int doctorId = Integer.parseInt(appointment.getDoctorId());
                 Doctor doctor = doctorDAO.findDoctorById(doctorId);
                 if (doctor != null) {
-                    String doctorDetails = String.format("Dr.%s (%s Specialist)", doctor.getName(), doctor.getSpecialization());
+                    String doctorDetails = String.format("(%d) Dr.%s (%s Specialist)", doctorId, doctor.getName(), doctor.getSpecialization());
 
                     int patientId = Integer.parseInt(appointment.getPatientId());
                     Patient patient = patientDAO.findPatientById(patientId);
                     if (patient != null) {
-                        String patientDetails = String.format("%s (%s) - %d years old",
+                        String patientDetails = String.format("(%d) %s (%s) - %d years old",
+                                patientId,
                                 patient.getName(),
                                 patient.getContactInfo(),
                                 patient.getAge());
@@ -196,5 +204,9 @@ public class AppointmentDAO {
         }
 
         return maxappointmentId + 1;
+    }
+
+    private boolean isNumeric(String str) {
+        return str != null && str.matches("\\d+");
     }
 }
