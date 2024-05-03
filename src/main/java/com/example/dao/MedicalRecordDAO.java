@@ -44,7 +44,7 @@ public class MedicalRecordDAO {
                     MedicalRecord formattedMedicalRecordObj = new MedicalRecord(recordId, patientDetails, medicalRecord.getReasonToVisit(), medicalRecord.getDiagnosis(), medicalRecord.getMedications(), medicalRecord.getAllergies());
                     formattedMedicalRecordList.add(formattedMedicalRecordObj);
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a patient with ID: " + patientId);
+                    throw new ResourceNotFoundException("Error occurred while finding a medicsl record for patient with ID: " + patientId);
                 }
             }
         }
@@ -62,7 +62,7 @@ public class MedicalRecordDAO {
                     patient.getName());
             formattedMedicalRecord = new MedicalRecord(medicalRecord.getRecordId(), patientDetails, medicalRecord.getReasonToVisit(), medicalRecord.getDiagnosis(), medicalRecord.getMedications(), medicalRecord.getAllergies());
         } else {
-            throw new ResourceNotFoundException("Error occurred while finding a patient with ID: " + patientId);
+            throw new ResourceNotFoundException("Error occurred while finding a medicsl record for patient with ID: " + patientId);
         }
         return formattedMedicalRecord;
     }

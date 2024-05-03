@@ -67,7 +67,7 @@ public class MedicalRecordResource {
             MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordById(medicalRecordId);
             if (medicalRecord != null) {
                 LOGGER.info("Medical record with ID {} fetched successfully!", medicalRecordId);
-                return new ResultData<>(medicalRecord, "Medical records with " + medicalRecordId + " fetched successfully!", "success");
+                return new ResultData<>(medicalRecord, "Medical record with " + medicalRecordId + " fetched successfully!", "success");
             } else {
                 throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId);
             }
@@ -87,7 +87,7 @@ public class MedicalRecordResource {
                 MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordByPatientId(patientId);
                 if (medicalRecord != null || medicalRecord.getRecordId() != 0) {
                     LOGGER.info("Medical record with ID {} fetched successfully!", patientId);
-                    return new ResultData<>(medicalRecord, "Medical records with " + patientId + " fetched successfully!", "success");
+                    return new ResultData<>(medicalRecord, "Medical record with " + patientId + " fetched successfully!", "success");
                 } else {
                     throw new ResourceNotFoundException("No medical record found with patient ID: " + patientId);
                 }
