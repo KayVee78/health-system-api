@@ -7,7 +7,6 @@ package com.example.dao;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.MedicalRecord;
 import com.example.model.Patient;
-import com.example.model.PatientMedicalHistory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
