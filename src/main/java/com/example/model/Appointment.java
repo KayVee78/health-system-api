@@ -4,7 +4,6 @@
  */
 package com.example.model;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -14,21 +13,21 @@ import java.util.List;
 public class Appointment {
 
     private int appointmentId;
-    private String patientId;
-    private String doctorId;
     private String date; //year-month-date format
     private String time; //24 hour format
+    private Patient patient;
+    private Doctor doctor;
     private List<String> associatedParticipants;
 
     public Appointment() {
     }
 
-    public Appointment(int appointmentId, String patientId, String doctorId, String date, String time, List<String> associatedParticipants) {
+    public Appointment(int appointmentId, String date, String time, Patient patient, Doctor doctor, List<String> associatedParticipants) {
         this.appointmentId = appointmentId;
-        this.patientId = patientId;
-        this.doctorId = doctorId;
         this.date = date;
         this.time = time;
+        this.doctor = doctor;
+        this.patient = patient;
         this.associatedParticipants = associatedParticipants;
     }
 
@@ -38,22 +37,6 @@ public class Appointment {
 
     public void setAppointmentId(int appointmentId) {
         this.appointmentId = appointmentId;
-    }
-
-    public String getPatientId() {
-        return patientId;
-    }
-
-    public void setPatientId(String patientId) {
-        this.patientId = patientId;
-    }
-
-    public String getDoctorId() {
-        return doctorId;
-    }
-
-    public void setDoctorId(String doctorId) {
-        this.doctorId = doctorId;
     }
 
     public String getDate() {
@@ -72,12 +55,27 @@ public class Appointment {
         this.time = time;
     }
 
-    public List<String> getassociatedParticipants() {
+    public List<String> getAssociatedParticipants() {
         return associatedParticipants;
     }
 
-    public void setassociatedParticipants(List<String> associatedParticipants) {
+    public void setAssociatedParticipants(List<String> associatedParticipants) {
         this.associatedParticipants = associatedParticipants;
     }
 
+    public Doctor getDoctor() {
+        return doctor;
+    }
+
+    public void setDoctor(Doctor doctor) {
+        this.doctor = doctor;
+    }
+
+    public Patient getPatient() {
+        return patient;
+    }
+
+    public void setPatient(Patient patient) {
+        this.patient = patient;
+    }
 }

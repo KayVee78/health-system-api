@@ -22,6 +22,10 @@ public class Doctor extends Person {
         this.doctorFee = doctorFee;
     }
 
+    public Doctor(int id) {
+        super(id);
+    }
+
     public String getSpecialization() {
         return specialization;
     }
@@ -45,5 +49,5 @@ public class Doctor extends Person {
     public void setDoctorFee(double doctorFee) {
         this.doctorFee = doctorFee;
     }
-    
+
 }

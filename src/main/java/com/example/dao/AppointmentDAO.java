@@ -26,8 +26,8 @@ public class AppointmentDAO {
     public static List<Doctor> doctors = DoctorDAO.doctors;
 
     static {
-        appointments.add(new Appointment(1, "2", "1", "2024-05-02", "18:00:00", List.of("Gayani Fernando (Wife)", "Samadhi Fernando (Daughter)")));
-        appointments.add(new Appointment(2, "1", "2", "2024-05-03", "17:00:00", List.of("Sanjeewani Dias (Wife)")));
+        appointments.add(new Appointment(1, "2024-05-02", "18:00:00", new Patient(2), new Doctor(2), List.of("Gayani Fernando (Wife)", "Samadhi Fernando (Daughter)")));
+        appointments.add(new Appointment(2, "2024-05-03", "17:00:00", new Patient(1), new Doctor(2), List.of("Sanjeewani Dias (Wife)")));
     }
 
     public List<Appointment> getAllAppointments() {
@@ -35,30 +35,23 @@ public class AppointmentDAO {
         if (!appointments.isEmpty()) {
             for (Appointment appointment : appointments) {
                 int appointmentId = appointment.getAppointmentId();
-                int doctorId = Integer.parseInt(appointment.getDoctorId());
+                int doctorId = appointment.getDoctor().getId();
                 Doctor doctor = doctorDAO.findDoctorById(doctorId);
-                if (doctor != null) {
-                    String doctorDetails = String.format("(%d) Dr.%s (%s Specialist)", doctorId, doctor.getName(), doctor.getSpecialization());
-                    int patientId = Integer.parseInt(appointment.getPatientId());
-                    Patient patient = patientDAO.findPatientById(patientId);
-                    if (patient != null) {
-                        String patientDetails = String.format("(%d) %s (%s) - %d years old",
-                                patientId,
-                                patient.getName(),
-                                patient.getContactInfo(),
-                                patient.getAge());
-                        String date = appointment.getDate();
-                        String time = appointment.getTime();
-                        List<String> associatedParticipants = appointment.getassociatedParticipants();
+                int patientId = appointment.getPatient().getId();
+                Patient patient = patientDAO.findPatientById(patientId);
 
-                        //Created a new Appointment Object with formatted data
-                        Appointment formattedAppointmentObj = new Appointment(appointmentId, patientDetails, doctorDetails, date, time, associatedParticipants);
-                        formattedAppontmentList.add(formattedAppointmentObj);
-                    } else {
-                        throw new ResourceNotFoundException("Error occurred while finding a patient with ID: " + patientId);
-                    }
+                if (doctor != null && patient != null) {
+                    Doctor doctorObj = doctor;
+                    String date = appointment.getDate();
+                    String time = appointment.getTime();
+                    List<String> associatedParticipants = appointment.getAssociatedParticipants();
+
+                    //Created a new Appointment Object with formatted data
+                    Appointment formattedAppointmentObj = new Appointment(appointmentId, date, time, patient, doctor, associatedParticipants);
+                    formattedAppontmentList.add(formattedAppointmentObj);
+
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a doctor with ID: " + doctorId);
+                    throw new ResourceNotFoundException("Error occurred while finding a doctor or patient with IDs");
                 }
             }
         }
@@ -70,34 +63,31 @@ public class AppointmentDAO {
     }
 
     public void addAppointment(Appointment appointment) {
-        if (appointment.getPatientId() != null && appointment.getDoctorId() != null && appointment.getDate() != null && appointment.getTime() != null) {
-            if (!isNumeric(appointment.getPatientId()) || !isNumeric(appointment.getDoctorId())) {
-                throw new ResourceNotFoundException("Patient/Doctor ID must be numeric. Failed to add a new medical record!");
-            }
+        if (appointment.getPatient().getId() > 0 && appointment.getDoctor().getId() > 0 && (appointment.getDate() instanceof String && appointment.getDate() != null) && (appointment.getTime() instanceof String && appointment.getTime() != null)) {
             boolean isValidPatientId = false;
             boolean isValidDoctorId = false;
             for (Patient patient : PatientDAO.patients) {
-                if (Integer.parseInt(appointment.getPatientId()) == patient.getId()) {
+                if (appointment.getPatient().getId() == patient.getId()) {
                     isValidPatientId = true;
                     break;
                 }
             }
 
             for (Doctor doctor : DoctorDAO.doctors) {
-                if (Integer.parseInt(appointment.getDoctorId()) == doctor.getId()) {
+                if (appointment.getDoctor().getId() == doctor.getId()) {
                     isValidDoctorId = true;
                     break;
                 }
             }
 
             if (!isValidDoctorId && !isValidPatientId) {
-                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with the ID " + appointment.getPatientId() + " and no doctor found with the ID " + appointment.getPatientId());
+                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with the ID " + appointment.getPatient().getId() + " and no doctor found with the ID " + appointment.getDoctor().getId());
             }
             if (!isValidPatientId) {
-                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with ID: " + appointment.getPatientId());
+                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with ID: " + appointment.getPatient().getId());
             }
             if (!isValidDoctorId) {
-                throw new ResourceNotFoundException("Error occured while adding a new appointment. No doctor found with ID: " + appointment.getDoctorId());
+                throw new ResourceNotFoundException("Error occured while adding a new appointment. No doctor found with ID: " + appointment.getDoctor().getId());
             }
 
             int newAppointmentId = getNextAppointmentId();
@@ -113,40 +103,39 @@ public class AppointmentDAO {
     }
 
     public void updateAppointmentData(Appointment updateAppointment) {
-        if (!isNumeric(updateAppointment.getPatientId()) || !isNumeric(updateAppointment.getDoctorId())) {
-            throw new ResourceNotFoundException("Patient/Doctor ID must be numeric. Failed to add a new medical record!");
-        }
-        boolean isValidPatientId = false;
-        boolean isValidDoctorId = false;
-        for (Patient patient : PatientDAO.patients) {
-            if (Integer.parseInt(updateAppointment.getPatientId()) == patient.getId()) {
-                isValidPatientId = true;
-                break;
+        if (updateAppointment.getPatient().getId() > 0 && updateAppointment.getDoctor().getId() > 0 && updateAppointment.getDate() instanceof String && updateAppointment.getTime() instanceof String) {
+            boolean isValidPatientId = false;
+            boolean isValidDoctorId = false;
+            for (Patient patient : PatientDAO.patients) {
+                if (updateAppointment.getPatient().getId() == patient.getId()) {
+                    isValidPatientId = true;
+                    break;
+                }
             }
-        }
 
-        for (Doctor doctor : DoctorDAO.doctors) {
-            if (Integer.parseInt(updateAppointment.getDoctorId()) == doctor.getId()) {
-                isValidDoctorId = true;
-                break;
+            for (Doctor doctor : DoctorDAO.doctors) {
+                if (updateAppointment.getDoctor().getId() == doctor.getId()) {
+                    isValidDoctorId = true;
+                    break;
+                }
             }
-        }
 
-        if (!isValidDoctorId && !isValidPatientId) {
-            throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with the ID " + updateAppointment.getPatientId() + " and no doctor found with the ID " + updateAppointment.getPatientId());
-        }
-        if (!isValidPatientId) {
-            throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with ID: " + updateAppointment.getPatientId());
-        }
-        if (!isValidDoctorId) {
-            throw new ResourceNotFoundException("Error occured while updating an appointment. No doctor found with ID: " + updateAppointment.getDoctorId());
-        }
+            if (!isValidDoctorId && !isValidPatientId) {
+                throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with the ID " + updateAppointment.getPatient().getId() + " and no doctor found with the ID " + updateAppointment.getDoctor().getId());
+            }
+            if (!isValidPatientId) {
+                throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with ID: " + updateAppointment.getPatient().getId());
+            }
+            if (!isValidDoctorId) {
+                throw new ResourceNotFoundException("Error occured while updating an appointment. No doctor found with ID: " + updateAppointment.getDoctor().getId());
+            }
 
-        for (int i = 0; i < appointments.size(); i++) {
-            Appointment appointment = appointments.get(i);
-            if (appointment.getAppointmentId() == updateAppointment.getAppointmentId()) {
-                appointments.set(i, updateAppointment);
-                return;
+            for (int i = 0; i < appointments.size(); i++) {
+                Appointment appointment = appointments.get(i);
+                if (appointment.getAppointmentId() == updateAppointment.getAppointmentId()) {
+                    appointments.set(i, updateAppointment);
+                    return;
+                }
             }
         }
     }
@@ -160,33 +149,21 @@ public class AppointmentDAO {
         Appointment appointmentDataFound = null;
         for (Appointment appointment : appointments) {
             if (appointment.getAppointmentId() == id) {
-                int doctorId = Integer.parseInt(appointment.getDoctorId());
+                int doctorId = appointment.getDoctor().getId();
                 Doctor doctor = doctorDAO.findDoctorById(doctorId);
-                if (doctor != null) {
-                    String doctorDetails = String.format("(%d) Dr.%s (%s Specialist)", doctorId, doctor.getName(), doctor.getSpecialization());
+                int patientId = appointment.getPatient().getId();
+                Patient patient = patientDAO.findPatientById(patientId);
+                if (doctor != null && patient != null) {
+                    String date = appointment.getDate();
+                    String time = appointment.getTime();
+                    List<String> associatedParticipants = appointment.getAssociatedParticipants();
 
-                    int patientId = Integer.parseInt(appointment.getPatientId());
-                    Patient patient = patientDAO.findPatientById(patientId);
-                    if (patient != null) {
-                        String patientDetails = String.format("(%d) %s (%s) - %d years old",
-                                patientId,
-                                patient.getName(),
-                                patient.getContactInfo(),
-                                patient.getAge());
-
-                        String date = appointment.getDate();
-                        String time = appointment.getTime();
-                        List<String> associatedParticipants = appointment.getassociatedParticipants();
-
-                        //Created a new Appointment Object with formatted data
-                        Appointment formattedAppointmentObj = new Appointment(id, patientDetails, doctorDetails, date, time, associatedParticipants);
-                        appointmentDataFound = formattedAppointmentObj;
-                        break;
-                    } else {
-                        throw new ResourceNotFoundException("Error occurred while finding a patient with ID: " + patientId);
-                    }
+                    //Created a new Appointment Object with formatted data
+                    Appointment formattedAppointmentObj = new Appointment(id, date, time, patient, doctor, associatedParticipants);
+                    appointmentDataFound = formattedAppointmentObj;
+                    break;
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a doctor with ID: " + doctorId);
+                    throw new ResourceNotFoundException("Error occurred while finding a doctor or patient with IDs");
                 }
             }
         }

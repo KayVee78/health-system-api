@@ -8,7 +8,6 @@ import com.example.dao.AppointmentDAO;
 import com.example.exception.InternalServerErrorException;
 import com.example.exception.ResourceNotFoundException;
 import com.example.model.Appointment;
-import com.example.model.Patient;
 import com.example.result.ResultData;
 import com.example.result.ResultWithNoData;
 import java.util.List;
