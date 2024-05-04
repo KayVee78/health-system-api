@@ -71,11 +71,7 @@ public class PrescriptionDAO {
     }
 
     public void addPrescription(Prescription prescription) {
-        if (prescription.getPatientId() != null && prescription.getMedication()!= null) {
-
-            if (!isNumeric(prescription.getPatientId())) {
-                throw new ResourceNotFoundException("Patient ID must be numeric. Failed to add a new prescription!");
-            }
+        if ((prescription.getPatientId() != null && isNumeric(prescription.getPatientId())) && (prescription.getMedication() != null && prescription.getMedication() instanceof List)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
                 if (patient.getId() == Integer.parseInt(prescription.getPatientId())) {
@@ -98,28 +94,30 @@ public class PrescriptionDAO {
     }
 
     public void updatePrescription(Prescription updatePrescription) {
-        if (!isNumeric(updatePrescription.getPatientId())) {
-            throw new ResourceNotFoundException("Patient ID must be numeric. Failed to add a new prescription!");
-        }
-        boolean isValidPatient = false;
-        for (Patient patient : PatientDAO.patients) {
-            if (patient.getId() == Integer.parseInt(updatePrescription.getPatientId())) {
-                isValidPatient = true;
-                break;
-            }
-        }
-        if (isValidPatient) {
-            for (int i = 0; i < prescriptions.size(); i++) {
-                Prescription prescription = prescriptions.get(i);
-                if (prescription.getPrescriptionId()== updatePrescription.getPrescriptionId()) {
-                    prescriptions.set(i, updatePrescription);
-                    return;
+        if ((updatePrescription.getPatientId() != null && isNumeric(updatePrescription.getPatientId())) && (updatePrescription.getMedication() != null && updatePrescription.getMedication() instanceof List)) {
+
+            boolean isValidPatient = false;
+            for (Patient patient : PatientDAO.patients) {
+                if (patient.getId() == Integer.parseInt(updatePrescription.getPatientId())) {
+                    isValidPatient = true;
+                    break;
                 }
             }
+            if (isValidPatient) {
+                for (int i = 0; i < prescriptions.size(); i++) {
+                    Prescription prescription = prescriptions.get(i);
+                    if (prescription.getPrescriptionId() == updatePrescription.getPrescriptionId()) {
+                        prescriptions.set(i, updatePrescription);
+                        return;
+                    }
+                }
+            } else {
+                throw new ResourceNotFoundException("Error occured while updating a prescription. No patient found with ID: " + updatePrescription.getPatientId());
+            }
         } else {
-            throw new ResourceNotFoundException("Error occured while updating a prescription. No patient found with ID: " + updatePrescription.getPatientId());
+            LOGGER.error("Missing mandatory field(s) in prescription data. Failed to update prescription!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in prescription data. Failed to update prescription!");
         }
-
     }
 
     public Prescription getPrescriptionByPatientId(int id) {
@@ -142,7 +140,7 @@ public class PrescriptionDAO {
     public Prescription findPrescriptionById(int id) {
         Prescription prescriptionFound = null;
         for (Prescription prescription : prescriptions) {
-            if (prescription.getPrescriptionId()== id) {
+            if (prescription.getPrescriptionId() == id) {
                 prescriptionFound = prescription;
                 break;
             }
@@ -151,17 +149,21 @@ public class PrescriptionDAO {
     }
 
     public int getNextPrescriptionId() {
-        int maxUserId = Integer.MIN_VALUE;
+        int maxPrescriptionId = 0;
+        if (prescriptions.size() > 0) {
+            maxPrescriptionId = Integer.MIN_VALUE;
 
-        for (Prescription prescription : prescriptions) {
-            int userId = prescription.getPrescriptionId();
-            if (userId > maxUserId) {
-                maxUserId = userId;
+            for (Prescription prescription : prescriptions) {
+                int prescriptionId = prescription.getPrescriptionId();
+                if (prescriptionId > maxPrescriptionId) {
+                    maxPrescriptionId = prescriptionId;
+                }
             }
+            return maxPrescriptionId + 1;
+        } else {
+            maxPrescriptionId = 1;
         }
-
-        return maxUserId + 1;
-
+        return maxPrescriptionId;
     }
 
     private boolean isNumeric(String str) {

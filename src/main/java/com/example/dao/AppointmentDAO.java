@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  */
 public class AppointmentDAO {
 
-    private static List<Appointment> appointments = new ArrayList<>();
+    public static List<Appointment> appointments = new ArrayList<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentDAO.class);
     private DoctorDAO doctorDAO = new DoctorDAO();
     private PatientDAO patientDAO = new PatientDAO();
@@ -27,7 +27,7 @@ public class AppointmentDAO {
 
     static {
         appointments.add(new Appointment(1, "2024-05-02", "18:00:00", new Patient(2), new Doctor(2), List.of("Gayani Fernando (Wife)", "Samadhi Fernando (Daughter)")));
-        appointments.add(new Appointment(2, "2024-05-03", "17:00:00", new Patient(1), new Doctor(2), List.of("Sanjeewani Dias (Wife)")));
+        appointments.add(new Appointment(2, "2024-05-03", "17:00:00", new Patient(1), new Doctor(1), List.of("Sanjeewani Dias (Wife)")));
     }
 
     public List<Appointment> getAllAppointments() {
@@ -103,7 +103,7 @@ public class AppointmentDAO {
     }
 
     public void updateAppointmentData(Appointment updateAppointment) {
-        if (updateAppointment.getPatient().getId() > 0 && updateAppointment.getDoctor().getId() > 0 && updateAppointment.getDate() instanceof String && updateAppointment.getTime() instanceof String) {
+        if (updateAppointment.getPatient().getId() > 0 && updateAppointment.getDoctor().getId() > 0 && (updateAppointment.getDate() instanceof String && updateAppointment.getDate() != null) && (updateAppointment.getTime() instanceof String && updateAppointment.getTime() != null)) {
             boolean isValidPatientId = false;
             boolean isValidDoctorId = false;
             for (Patient patient : PatientDAO.patients) {
@@ -171,16 +171,21 @@ public class AppointmentDAO {
     }
 
     public int getNextAppointmentId() {
-        int maxappointmentId = Integer.MIN_VALUE;
+        int maxappointmentId = 0;
+        if (appointments.size() > 0) {
+            maxappointmentId = Integer.MIN_VALUE;
 
-        for (Appointment appointment : appointments) {
-            int appointmentId = appointment.getAppointmentId();
-            if (appointmentId > maxappointmentId) {
-                maxappointmentId = appointmentId;
+            for (Appointment appointment : appointments) {
+                int appointmentId = appointment.getAppointmentId();
+                if (appointmentId > maxappointmentId) {
+                    maxappointmentId = appointmentId;
+                }
             }
+            maxappointmentId += 1;
+        } else {
+            maxappointmentId = 1;
         }
-
-        return maxappointmentId + 1;
+        return maxappointmentId;
     }
 
     private boolean isNumeric(String str) {

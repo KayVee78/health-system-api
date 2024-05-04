@@ -62,7 +62,7 @@ public class MedicalRecordDAO {
                     patient.getName());
             formattedMedicalRecord = new MedicalRecord(medicalRecord.getRecordId(), patientDetails, medicalRecord.getReasonToVisit(), medicalRecord.getDiagnosis(), medicalRecord.getMedications(), medicalRecord.getAllergies());
         } else {
-            throw new ResourceNotFoundException("Error occurred while finding a medicsl record for patient with ID: " + patientId);
+            throw new ResourceNotFoundException("Error occurred while finding a medical record for patient with ID: " + patientId);
         }
         return formattedMedicalRecord;
     }
@@ -72,11 +72,7 @@ public class MedicalRecordDAO {
     }
 
     public void addMedicalRecord(MedicalRecord medicalRecord) {
-        if (medicalRecord.getPatientId() != null && medicalRecord.getReasonToVisit() != null && medicalRecord.getDiagnosis() != null && medicalRecord.getMedications() != null && medicalRecord.getAllergies() != null) {
-
-            if (!isNumeric(medicalRecord.getPatientId())) {
-                throw new ResourceNotFoundException("Patient ID must be numeric. Failed to add a new medical record!");
-            }
+        if ((medicalRecord.getPatientId() != null && isNumeric(medicalRecord.getPatientId())) && (medicalRecord.getReasonToVisit() != null && medicalRecord.getReasonToVisit() instanceof String) && (medicalRecord.getDiagnosis() != null && medicalRecord.getDiagnosis() instanceof String) && (medicalRecord.getMedications() != null && medicalRecord.getMedications() instanceof String) && (medicalRecord.getAllergies() != null && medicalRecord.getAllergies() instanceof String)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
                 if (patient.getId() == Integer.parseInt(medicalRecord.getPatientId())) {
@@ -99,26 +95,28 @@ public class MedicalRecordDAO {
     }
 
     public void updateMedicalRecord(MedicalRecord updateMedicalRecord) {
-        if (!isNumeric(updateMedicalRecord.getPatientId())) {
-            throw new ResourceNotFoundException("Patient ID must be numeric. Failed to add a new medical record!");
-        }
-        boolean isValidPatient = false;
-        for (Patient patient : PatientDAO.patients) {
-            if (patient.getId() == Integer.parseInt(updateMedicalRecord.getPatientId())) {
-                isValidPatient = true;
-                break;
-            }
-        }
-        if (isValidPatient) {
-            for (int i = 0; i < medicalRecords.size(); i++) {
-                MedicalRecord medicalRecord = medicalRecords.get(i);
-                if (medicalRecord.getRecordId() == updateMedicalRecord.getRecordId()) {
-                    medicalRecords.set(i, updateMedicalRecord);
-                    return;
+        if ((updateMedicalRecord.getPatientId() != null && isNumeric(updateMedicalRecord.getPatientId())) && (updateMedicalRecord.getReasonToVisit() != null && updateMedicalRecord.getReasonToVisit() instanceof String) && (updateMedicalRecord.getDiagnosis() != null && updateMedicalRecord.getDiagnosis() instanceof String) && (updateMedicalRecord.getMedications() != null && updateMedicalRecord.getMedications() instanceof String) && (updateMedicalRecord.getAllergies() != null && updateMedicalRecord.getAllergies() instanceof String)) {
+            boolean isValidPatient = false;
+            for (Patient patient : PatientDAO.patients) {
+                if (patient.getId() == Integer.parseInt(updateMedicalRecord.getPatientId())) {
+                    isValidPatient = true;
+                    break;
                 }
             }
+            if (isValidPatient) {
+                for (int i = 0; i < medicalRecords.size(); i++) {
+                    MedicalRecord medicalRecord = medicalRecords.get(i);
+                    if (medicalRecord.getRecordId() == updateMedicalRecord.getRecordId()) {
+                        medicalRecords.set(i, updateMedicalRecord);
+                        return;
+                    }
+                }
+            } else {
+                throw new ResourceNotFoundException("Error occured while updating a medical record. No patient found with ID: " + updateMedicalRecord.getPatientId());
+            }
         } else {
-            throw new ResourceNotFoundException("Error occured while updating a medical record. No patient found with ID: " + updateMedicalRecord.getPatientId());
+            LOGGER.error("Missing mandatory field(s) in medical record data. Failed to update the medical record!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in medical record data. Failed to update the medical record!");
         }
 
     }
@@ -152,17 +150,21 @@ public class MedicalRecordDAO {
     }
 
     public int getNextRecordId() {
-        int maxUserId = Integer.MIN_VALUE;
+        int maxRecordId = 0;
+        if (medicalRecords.size() > 0) {
+            maxRecordId = Integer.MIN_VALUE;
 
-        for (MedicalRecord medicalRecord : medicalRecords) {
-            int userId = medicalRecord.getRecordId();
-            if (userId > maxUserId) {
-                maxUserId = userId;
+            for (MedicalRecord medicalRecord : medicalRecords) {
+                int recordId = medicalRecord.getRecordId();
+                if (recordId > maxRecordId) {
+                    maxRecordId = recordId;
+                }
             }
+            return maxRecordId + 1;
+        } else {
+            maxRecordId = 1;
         }
-
-        return maxUserId + 1;
-
+        return maxRecordId;
     }
 
     private boolean isNumeric(String str) {

@@ -35,7 +35,7 @@ public class PersonDAO {
     }
 
     public void addPerson(Person person) {
-        if (person.getName() != null && person.getAddress() != null && person.getContactInfo() != null) {
+        if ((person.getName() != null && person.getName() instanceof String) && (person.getAddress() != null && person.getAddress() instanceof String) && (person.getContactInfo() != null && person.getContactInfo() instanceof String)) {
             int newUserId = getNextUserId();
             person.setId(newUserId);
             persons.add(person);
@@ -47,12 +47,17 @@ public class PersonDAO {
     }
 
     public void updatePerson(Person updatePerson) {
-        for (int i = 0; i < persons.size(); i++) {
-            Person person = persons.get(i);
-            if (person.getId() == updatePerson.getId()) {
-                persons.set(i, updatePerson);
-                return;
+        if ((updatePerson.getName() != null && updatePerson.getName() instanceof String) && (updatePerson.getAddress() != null && updatePerson.getAddress() instanceof String) && (updatePerson.getContactInfo() != null && updatePerson.getContactInfo() instanceof String)) {
+            for (int i = 0; i < persons.size(); i++) {
+                Person person = persons.get(i);
+                if (person.getId() == updatePerson.getId()) {
+                    persons.set(i, updatePerson);
+                    return;
+                }
             }
+        } else {
+            LOGGER.error("Missing mandatory field(s) in person data. Failed to update Person!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in person data. Failed to update Person!");
         }
     }
 
@@ -69,15 +74,20 @@ public class PersonDAO {
     }
 
     public int getNextUserId() {
-        int maxUserId = Integer.MIN_VALUE;
+        int maxUserId = 0;
+        if (persons.size() > 0) {
+            maxUserId = Integer.MIN_VALUE;
 
-        for (Person person : persons) {
-            int userId = person.getId();
-            if (userId > maxUserId) {
-                maxUserId = userId;
+            for (Person person : persons) {
+                int userId = person.getId();
+                if (userId > maxUserId) {
+                    maxUserId = userId;
+                }
             }
+            return maxUserId + 1;
+        } else {
+            maxUserId = 1;
         }
-
-        return maxUserId + 1;
+        return maxUserId;
     }
 }

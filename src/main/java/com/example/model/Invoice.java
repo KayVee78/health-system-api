@@ -10,13 +10,13 @@ package com.example.model;
  */
 public class Invoice {
     private String patientDetails;
-    private int amountPayable; //doctor fee + hospital charges
+    private double amountPayable; //doctor fee + hospital charges
     private String date;
 
     public Invoice() {
     }
 
-    public Invoice(String patientDetails, int amountPayable, String date) {
+    public Invoice(String patientDetails, double amountPayable, String date) {
         this.patientDetails = patientDetails;
         this.amountPayable = amountPayable;
         this.date = date;
@@ -30,19 +30,19 @@ public class Invoice {
         this.patientDetails = patientDetails;
     }
 
-    public int getServicecharges() {
-        return amountPayable;
-    }
-
-    public void setServicecharges(int amountPayable) {
-        this.amountPayable = amountPayable;
-    }
-
     public String getDate() {
         return date;
     }
 
     public void setDate(String date) {
         this.date = date;
+    }
+
+    public double getAmountPayable() {
+        return amountPayable;
+    }
+
+    public void setAmountPayable(double amountPayable) {
+        this.amountPayable = amountPayable;
     }
 }

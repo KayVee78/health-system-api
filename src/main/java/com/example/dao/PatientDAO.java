@@ -42,7 +42,7 @@ public class PatientDAO {
     }
 
     public void addPatient(Patient patient) {
-        if (patient.getName() != null && patient.getAddress() != null && patient.getContactInfo() != null && patient.getMedicalHistory() != null && patient.getCurrentHealthStatus() != null) {
+        if ((patient.getName() != null && patient.getName() instanceof String) && (patient.getAddress() != null && patient.getAddress() instanceof String) && (patient.getContactInfo() != null && patient.getContactInfo() instanceof String) && (patient.getMedicalHistory() != null && patient.getMedicalHistory() instanceof List) && (patient.getCurrentHealthStatus() != null && patient.getCurrentHealthStatus() instanceof String)) {
             int newUserId = getNextUserId();
             patient.setId(newUserId);
             patients.add(patient);
@@ -54,12 +54,17 @@ public class PatientDAO {
     }
 
     public void updatePatient(Patient updatePatient) {
-        for (int i = 0; i < patients.size(); i++) {
-            Patient patient = patients.get(i);
-            if (patient.getId() == updatePatient.getId()) {
-                patients.set(i, updatePatient);
-                return;
+        if ((updatePatient.getName() != null && updatePatient.getName() instanceof String) && (updatePatient.getAddress() != null && updatePatient.getAddress() instanceof String) && (updatePatient.getContactInfo() != null && updatePatient.getContactInfo() instanceof String) && (updatePatient.getMedicalHistory() != null && updatePatient.getMedicalHistory() instanceof List) && (updatePatient.getCurrentHealthStatus() != null && updatePatient.getCurrentHealthStatus() instanceof String)) {
+            for (int i = 0; i < patients.size(); i++) {
+                Patient patient = patients.get(i);
+                if (patient.getId() == updatePatient.getId()) {
+                    patients.set(i, updatePatient);
+                    return;
+                }
             }
+        } else {
+            LOGGER.error("Missing mandatory field(s) in patient data. Failed to update Patient!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in patient data. Failed to update Patient!");
         }
     }
 
@@ -76,18 +81,20 @@ public class PatientDAO {
     }
 
     public int getNextUserId() {
-        //Initialize the maxUserId with a value lower than any possible userId
-        int maxUserId = Integer.MIN_VALUE;
+        int maxUserId = 0;
+        if (patients.size() > 0) {
+            maxUserId = Integer.MIN_VALUE;
 
-        //Iterage through the list and finding the maximum userId
-        for (Patient patient : patients) {
-            int userId = patient.getId();
-            if (userId > maxUserId) {
-                maxUserId = userId;
+            for (Patient patient : patients) {
+                int userId = patient.getId();
+                if (userId > maxUserId) {
+                    maxUserId = userId;
+                }
             }
+            return maxUserId + 1;
+        } else {
+            maxUserId = 1;
         }
-
-        //Increment the mxUserId to get the next available userId
-        return maxUserId + 1;
+        return maxUserId;
     }
 }
