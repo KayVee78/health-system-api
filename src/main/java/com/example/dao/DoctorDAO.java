@@ -35,7 +35,7 @@ public class DoctorDAO {
     }
 
     public void addDoctor(Doctor doctor) {
-        if (doctor.getName() != null && doctor.getAddress() != null && doctor.getContactInfo() != null && doctor.getSpecialization() != null && doctor.getDoctorFee() != 0.0) {
+        if ((doctor.getName() != null && doctor.getName() instanceof String) && (doctor.getAddress() != null && doctor.getAddress() instanceof String) && (doctor.getContactInfo() != null && doctor.getContactInfo() instanceof String) && (doctor.getSpecialization() != null && doctor.getSpecialization() instanceof String) && doctor.getDoctorFee() > 0) {
             int newUserId = getNextUserId();
             doctor.setId(newUserId);
             doctors.add(doctor);
@@ -47,13 +47,19 @@ public class DoctorDAO {
     }
 
     public void updateDoctor(Doctor updateDoctor) {
-        for (int i = 0; i < doctors.size(); i++) {
-            Doctor doctor = doctors.get(i);
-            if (doctor.getId() == updateDoctor.getId()) {
-                doctors.set(i, updateDoctor);
-                return;
+        if ((updateDoctor.getName() != null && updateDoctor.getName() instanceof String) && (updateDoctor.getAddress() != null && updateDoctor.getAddress() instanceof String) && (updateDoctor.getContactInfo() != null && updateDoctor.getContactInfo() instanceof String) && (updateDoctor.getSpecialization() != null && updateDoctor.getSpecialization() instanceof String) && updateDoctor.getDoctorFee() > 0) {
+            for (int i = 0; i < doctors.size(); i++) {
+                Doctor doctor = doctors.get(i);
+                if (doctor.getId() == updateDoctor.getId()) {
+                    doctors.set(i, updateDoctor);
+                    return;
+                }
             }
+        } else {
+            LOGGER.error("Missing mandatory field(s) in doctor data. Failed to update the Doctor!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in doctor data. Failed to update the Doctor!");
         }
+
     }
 
     //HELPER METHODS
@@ -69,14 +75,20 @@ public class DoctorDAO {
     }
 
     public int getNextUserId() {
-        int maxUserId = Integer.MIN_VALUE;
+        int maxUserId = 0;
+        if (doctors.size() > 0) {
+            maxUserId = Integer.MIN_VALUE;
 
-        for (Doctor doctor : doctors) {
-            int userId = doctor.getId();
-            if (userId > maxUserId) {
-                maxUserId = userId;
+            for (Doctor doctor : doctors) {
+                int userId = doctor.getId();
+                if (userId > maxUserId) {
+                    maxUserId = userId;
+                }
             }
+            return maxUserId + 1;
+        } else {
+            maxUserId = 1;
         }
-        return maxUserId + 1;
+        return maxUserId;
     }
 }

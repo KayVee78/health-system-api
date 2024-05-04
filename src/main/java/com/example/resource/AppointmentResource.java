@@ -98,7 +98,7 @@ public class AppointmentResource {
     @Path("/{appointmentId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData updatePatient(@PathParam("appointmentId") int appointmentId, Appointment updateAppointment) {
+    public ResultWithNoData updateAppointment(@PathParam("appointmentId") int appointmentId, Appointment updateAppointment) {
         try {
             Appointment existingAppointment = appointmentDAO.findAppointmentById(appointmentId);
 

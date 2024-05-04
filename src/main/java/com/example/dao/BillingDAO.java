@@ -5,8 +5,12 @@
 package com.example.dao;
 
 import static com.example.dao.BillingDAO.bills;
+import com.example.exception.ResourceNotFoundException;
+import com.example.model.Appointment;
 import com.example.model.Billing;
+import com.example.model.Doctor;
 import com.example.model.Invoice;
+import com.example.model.Patient;
 import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
@@ -20,24 +24,119 @@ public class BillingDAO {
 
     public static List<Billing> bills = new ArrayList<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(BillingDAO.class);
-    private BillingDAO billDAO = new BillingDAO();
     final double HOSPITALCHARGES = 2500;
 
+    AppointmentDAO appointmentDAO = new AppointmentDAO();
+    PatientDAO patietDAO = new PatientDAO();
+    DoctorDAO doctorDAO = new DoctorDAO();
+
     static {
-        bills.add(new Billing(1, 1, new Invoice("Ashan Dias (0772572800) - Channeled Doctor - Dr. Neranjan Perera (Diabetologist)", 5500, "2024-05-03"), 5500, 0));
-        bills.add(new Billing(2, 2, new Invoice("Janaka Fernando (0712359807)- Channeled Doctor - Dr. Tiran Gamlath (Cardiologist)", 6000, "2024-05-02"), 6000, 0));
+        bills.add(new Billing(1, 2, new Invoice("Ashan Dias (0772572800) - Channeled Doctor - Dr. Neranjan Perera (Diabetologist)", 5500, "2024-05-03"), 5500, 0));
+        bills.add(new Billing(2, 1, new Invoice("Janaka Fernando (0712359807)- Channeled Doctor - Dr. Tiran Gamlath (Cardiologist)", 6000, "2024-05-02"), 6000, 0));
 
     }
 
-    public List<Billing> getAllBills() {
+    public List<Billing> getAllBillingData() {
         return bills;
     }
-    
-    //HELPER METHODS
-    public Billing findBillingById(int id) {
+
+    public List<Billing> getNonModifiedBillingList() {
+        return bills;
+    }
+
+    public void addBillingData(Billing bill) {
+        if (bill.getAppointmentId() > 0 && (bill.getInvoiceInfo() instanceof Invoice && bill.getInvoiceInfo() != null) && bill.getAmountPaid() > 0 && (bill.getInvoiceInfo().getDate() instanceof String && bill.getInvoiceInfo().getDate() != null)) {
+            boolean isValidAppointmentId = false;
+            for (Appointment appointment : AppointmentDAO.appointments) {
+                if (appointment.getAppointmentId() == bill.getAppointmentId()) {
+                    isValidAppointmentId = true;
+                    break;
+                }
+            }
+
+            if (isValidAppointmentId) {
+                int newBillingId = getNextBillingId();
+                Appointment appointment = appointmentDAO.findAppointmentById(bill.getAppointmentId());
+
+                Patient patient = patietDAO.findPatientById(appointment.getPatient().getId());
+                Doctor doctor = doctorDAO.findDoctorById(appointment.getDoctor().getId());
+                if ((patient != null) && (patient instanceof Patient) && (doctor != null) && (doctor instanceof Doctor)) {
+                    String patientDetails = String.format("%s (%s) - Channeled Doctor - Dr. %s (%s)", patient.getName(), patient.getContactInfo(), doctor.getName(), doctor.getSpecialization());
+                    double amountPayable = doctor.getDoctorFee() + HOSPITALCHARGES;
+                    double balance = bill.getAmountPaid() - amountPayable;
+
+                    if (balance >= 0) {
+                        bills.add(new Billing(newBillingId, bill.getAppointmentId(), new Invoice(patientDetails, amountPayable, bill.getInvoiceInfo().getDate()), bill.getAmountPaid(), balance));
+                    }
+
+                } else {
+                    throw new ResourceNotFoundException("Error occurred while finding the doctor or patient of the respectiive appointment ID");
+
+                }
+            } else {
+                throw new ResourceNotFoundException("No appointment found with ID: " + bill.getAppointmentId());
+            }
+        } else {
+            LOGGER.error("Missing mandatory field(s) in billing data. Failed to add a new Bill!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in billing data. Failed to add a new Bill!");
+        }
+
+    }
+
+    public void updateBillingData(Billing updateBill) {
+        if (updateBill.getAppointmentId() > 0 && (updateBill.getInvoiceInfo() instanceof Invoice && updateBill.getInvoiceInfo() != null) && updateBill.getAmountPaid() > 0 && (updateBill.getInvoiceInfo().getDate() instanceof String && updateBill.getInvoiceInfo().getDate() != null)) {
+            boolean isValidAppointmentId = false;
+            Billing formattedUpdateBill = null;
+            for (Appointment appointment : AppointmentDAO.appointments) {
+                if (appointment.getAppointmentId() == updateBill.getAppointmentId()) {
+                    isValidAppointmentId = true;
+                    break;
+                }
+            }
+
+            if (isValidAppointmentId) {
+                Appointment appointment = appointmentDAO.findAppointmentById(updateBill.getAppointmentId());
+                Patient patient = patietDAO.findPatientById(appointment.getPatient().getId());
+                Doctor doctor = doctorDAO.findDoctorById(appointment.getDoctor().getId());
+                if ((patient != null) || (patient instanceof Patient) || (doctor != null) && (doctor instanceof Doctor)) {
+                    String patientDetails = String.format("%s (%s) - Channeled Doctor - Dr. %s (%s)", patient.getName(), patient.getContactInfo(), doctor.getName(), doctor.getSpecialization());
+                    double amountPayable = doctor.getDoctorFee() + HOSPITALCHARGES;
+                    if (updateBill.getAmountPaid() > amountPayable) {
+                        double balance = updateBill.getAmountPaid() - amountPayable;
+                        if (balance >= 0) {
+                            formattedUpdateBill = new Billing(updateBill.getBillingId(), updateBill.getAppointmentId(), new Invoice(patientDetails, amountPayable, updateBill.getInvoiceInfo().getDate()), updateBill.getAmountPaid(), balance);
+
+                            for (int i = 0; i < bills.size(); i++) {
+                                Billing billing = bills.get(i);
+                                if (billing.getBillingId() == updateBill.getBillingId()) {
+                                    bills.set(i, formattedUpdateBill);
+                                    return;
+                                }
+                            }
+                        }
+                    } else {
+                        throw new ResourceNotFoundException("Amount paid is not sufficient to the complete the bill payment process");
+                    }
+                } else {
+                    throw new ResourceNotFoundException("Error occurred while finding the doctor or patient of the respectiive appointment ID");
+                }
+            } else {
+                throw new ResourceNotFoundException("No appointment found with ID: " + updateBill.getAppointmentId());
+            }
+        } else {
+            LOGGER.error("Missing mandatory field(s) in billing data. Failed to update Bill!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in billing data. Failed to update Bill!");
+        }
+    }
+
+    public void deleteBillingData(int id) {
+        bills.removeIf(bill -> bill.getBillingId() == id);
+    }
+
+    public Billing findBillingDataByAppointmentId(int id) {
         Billing billFound = null;
         for (Billing bill : bills) {
-            if (bill.getBillingId()== id) {
+            if (bill.getAppointmentId() == id) {
                 billFound = bill;
                 break;
             }
@@ -45,19 +144,33 @@ public class BillingDAO {
         return billFound;
     }
 
-    public int getNextBillId() {
-        //Initialize the maxUserId with a value lower than any possible userId
-        int maxUserId = Integer.MIN_VALUE;
-
-        //Iterage through the list and finding the maximum userId
+    //HELPER METHODS
+    public Billing findBillingDataById(int id) {
+        Billing billFound = null;
         for (Billing bill : bills) {
-            int userId = bill.getBillingId();
-            if (userId > maxUserId) {
-                maxUserId = userId;
+            if (bill.getBillingId() == id) {
+                billFound = bill;
+                break;
             }
         }
+        return billFound;
+    }
 
-        //Increment the mxUserId to get the next available userId
-        return maxUserId + 1;
+    public int getNextBillingId() {
+        int maxBillId = 0;
+        if (bills.size() > 0) {
+            maxBillId = Integer.MIN_VALUE;
+
+            for (Billing bill : bills) {
+                int billId = bill.getBillingId();
+                if (billId > maxBillId) {
+                    maxBillId = billId;
+                }
+            }
+            return maxBillId + 1;
+        } else {
+            maxBillId = 1;
+        }
+        return maxBillId;
     }
 }

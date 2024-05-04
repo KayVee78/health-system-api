@@ -11,18 +11,18 @@ package com.example.model;
 public class Billing {
 
     private int billingId;
-    private int patientId;
-    private Invoice invoiveInfo;
+    private int appointmentId;
+    private Invoice invoiceInfo;
     private double amountPaid;
     private double balance;
 
     public Billing() {
     }
 
-    public Billing(int billingId, int patientId, Invoice invoiveInfo, double amountPaid, double balance) {
+    public Billing(int billingId, int appointmentId, Invoice invoiceInfo, double amountPaid, double balance) {
         this.billingId = billingId;
-        this.patientId = patientId;
-        this.invoiveInfo = invoiveInfo;
+        this.appointmentId = appointmentId;
+        this.invoiceInfo = invoiceInfo;
         this.amountPaid = amountPaid;
         this.balance = balance;
     }
@@ -35,20 +35,12 @@ public class Billing {
         this.billingId = billingId;
     }
 
-    public int getPatientId() {
-        return patientId;
+    public Invoice getInvoiceInfo() {
+        return invoiceInfo;
     }
 
-    public void setPatientId(int patientId) {
-        this.patientId = patientId;
-    }
-
-    public Invoice getInvoiveInfo() {
-        return invoiveInfo;
-    }
-
-    public void setInvoiveInfo(Invoice invoiveInfo) {
-        this.invoiveInfo = invoiveInfo;
+    public void setInvoiceInfo(Invoice invoiceInfo) {
+        this.invoiceInfo = invoiceInfo;
     }
 
     public double getAmountPaid() {
@@ -67,4 +59,11 @@ public class Billing {
         this.balance = balance;
     }
 
+    public int getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(int appointmentId) {
+        this.appointmentId = appointmentId;
+    }
 }
