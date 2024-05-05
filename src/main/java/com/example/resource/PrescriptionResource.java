@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,9 @@ public class PrescriptionResource {
             LOGGER.info("{} prescriptions fetched", prescriptions.size());
 
             if (prescriptions.isEmpty()) {
-                throw new ResourceNotFoundException("No prescriptions found!");
+                throw new ResourceNotFoundException("No prescriptions found!", Response.Status.NOT_FOUND);
             } else {
-                return new ResultData<>(prescriptions, "Prescriptions fetched successfully!", "success");
+                return new ResultData<>(prescriptions, "Prescriptions fetched successfully!", Response.Status.OK);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -64,9 +65,9 @@ public class PrescriptionResource {
             Prescription prescription = prescriptionDAO.getPrescriptionById(prescriptionId);
             if (prescription != null) {
                 LOGGER.info("Prescription with ID {} fetched successfully!", prescriptionId);
-                return new ResultData<>(prescription, "Prescription with " + prescriptionId + " fetched successfully!", "success");
+                return new ResultData<>(prescription, "Prescription with " + prescriptionId + " fetched successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No prescription found with ID: " + prescriptionId);
+                throw new ResourceNotFoundException("No prescription found with ID: " + prescriptionId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -82,14 +83,14 @@ public class PrescriptionResource {
             if (patientId > 0) {
                 LOGGER.info("Getting prescription by id: {}", patientId);
                 Prescription prescription = prescriptionDAO.getPrescriptionByPatientId(patientId);
-                if (prescription != null || prescription.getPrescriptionId()!= 0) {
+                if (prescription != null || prescription.getPrescriptionId() != 0) {
                     LOGGER.info("Prescription with ID {} fetched successfully!", patientId);
-                    return new ResultData<>(prescription, "Prescriptions with " + patientId + " fetched successfully!", "success");
+                    return new ResultData<>(prescription, "Prescriptions with " + patientId + " fetched successfully!", Response.Status.OK);
                 } else {
-                    throw new ResourceNotFoundException("No prescription found for patient ID: " + patientId);
+                    throw new ResourceNotFoundException("No prescription found for patient ID: " + patientId, Response.Status.NOT_FOUND);
                 }
             } else {
-                throw new ResourceNotFoundException("Invalid patient ID: " + patientId);
+                throw new ResourceNotFoundException("Invalid patient ID: " + patientId, Response.Status.NOT_FOUND);
 
             }
         } catch (InternalServerErrorException e) {
@@ -101,7 +102,7 @@ public class PrescriptionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData addPrescription(Prescription prescription) {
+    public ResultData<Prescription> addPrescription(Prescription prescription) {
         try {
             List<Prescription> prescriptions = prescriptionDAO.getAllPrescriptions();
             int prevPrescriptionListSize = prescriptions.size();
@@ -109,9 +110,9 @@ public class PrescriptionResource {
             prescriptions = prescriptionDAO.getAllPrescriptions();
             if (prescriptions.size() > prevPrescriptionListSize) {
                 LOGGER.info("New prescription added successfully!");
-                return new ResultWithNoData("New prescription added successfully!", "success");
+                return new ResultData(prescriptionDAO.findPrescriptionById(prescriptions.size()), "New prescription added successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("Failed to add a new prescription!");
+                throw new ResourceNotFoundException("Failed to add a new prescription!", Response.Status.BAD_REQUEST);
             }
 
         } catch (InternalServerErrorException e) {
@@ -123,7 +124,7 @@ public class PrescriptionResource {
     @Path("/{prescriptionId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData updatePrescription(@PathParam("prescriptionId") int prescriptionId, Prescription updatePrescription) {
+    public ResultData<Prescription> updatePrescription(@PathParam("prescriptionId") int prescriptionId, Prescription updatePrescription) {
         try {
             Prescription existingPrescription = prescriptionDAO.findPrescriptionById(prescriptionId);
 
@@ -131,9 +132,9 @@ public class PrescriptionResource {
                 updatePrescription.setPrescriptionId(prescriptionId);
                 prescriptionDAO.updatePrescription(updatePrescription);
                 LOGGER.info("Prescription with ID {} updated successfully!", prescriptionId);
-                return new ResultWithNoData("Prescription with ID " + prescriptionId + " updated successfully!", "success");
+                return new ResultData(prescriptionDAO.findPrescriptionById(prescriptionId), "Prescription with ID " + prescriptionId + " updated successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No prescription found with ID: " + prescriptionId);
+                throw new ResourceNotFoundException("No prescription found with ID: " + prescriptionId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -150,9 +151,9 @@ public class PrescriptionResource {
                 prescriptionDAO.deletePrescription(prescriptionId);
                 LOGGER.info("Prescription with ID {} removed successfully!", prescriptionId);
 
-                return new ResultWithNoData("Prescription with ID " + prescriptionId + " removed successfully!", "success");
+                return new ResultWithNoData("Prescription with ID " + prescriptionId + " removed successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No prescription found with ID: " + prescriptionId);
+                throw new ResourceNotFoundException("No prescription found with ID: " + prescriptionId, Response.Status.NOT_FOUND);
             }
 
         } catch (InternalServerErrorException e) {

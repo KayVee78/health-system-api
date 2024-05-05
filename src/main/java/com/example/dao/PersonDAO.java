@@ -9,6 +9,8 @@ import com.example.model.Person;
 import com.example.model.Person;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,19 +37,19 @@ public class PersonDAO {
     }
 
     public void addPerson(Person person) {
-        if ((person.getName() != null && person.getName() instanceof String) && (person.getAddress() != null && person.getAddress() instanceof String) && (person.getContactInfo() != null && person.getContactInfo() instanceof String)) {
+        if ((person.getName() != null && person.getName() instanceof String && !person.getName().isEmpty()) && (person.getAddress() != null && person.getAddress() instanceof String && !person.getAddress().isEmpty()) && (person.getContactInfo() != null && person.getContactInfo() instanceof String && !person.getContactInfo().isEmpty())) {
             int newUserId = getNextUserId();
             person.setId(newUserId);
             persons.add(person);
         } else {
             LOGGER.error("Missing mandatory field(s) in person data. Failed to add a new Person!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in person data. Failed to add a new Person!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in person data. Failed to add a new Person!", Status.BAD_REQUEST);
         }
 
     }
 
     public void updatePerson(Person updatePerson) {
-        if ((updatePerson.getName() != null && updatePerson.getName() instanceof String) && (updatePerson.getAddress() != null && updatePerson.getAddress() instanceof String) && (updatePerson.getContactInfo() != null && updatePerson.getContactInfo() instanceof String)) {
+        if ((updatePerson.getName() != null && updatePerson.getName() instanceof String && !updatePerson.getName().isEmpty()) && (updatePerson.getAddress() != null && updatePerson.getAddress() instanceof String && !updatePerson.getAddress().isEmpty()) && (updatePerson.getContactInfo() != null && updatePerson.getContactInfo() instanceof String && !updatePerson.getContactInfo().isEmpty())) {
             for (int i = 0; i < persons.size(); i++) {
                 Person person = persons.get(i);
                 if (person.getId() == updatePerson.getId()) {
@@ -57,7 +59,7 @@ public class PersonDAO {
             }
         } else {
             LOGGER.error("Missing mandatory field(s) in person data. Failed to update Person!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in person data. Failed to update Person!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in person data. Failed to update Person!", Response.Status.BAD_REQUEST);
         }
     }
 

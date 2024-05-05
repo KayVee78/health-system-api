@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,9 @@ public class PersonResource {
             LOGGER.info("{} persons fetched", persons.size());
 
             if (persons.isEmpty()) {
-                throw new ResourceNotFoundException("No persons found!");
+                throw new ResourceNotFoundException("No persons found!", Response.Status.BAD_REQUEST);
             } else {
-                return new ResultData<>(persons, "Persons fetched successfully!", "success");
+                return new ResultData<>(persons, "Persons fetched successfully!", Response.Status.OK);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -64,9 +65,9 @@ public class PersonResource {
             Person person = personDAO.findPersonById(personId);
             if (person != null) {
                 LOGGER.info("Person with ID {} fetched successfully!", personId);
-                return new ResultData<>(person, "Persons with " + personId + " fetched successfully!", "success");
+                return new ResultData<>(person, "Persons with " + personId + " fetched successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No person found with ID: " + personId);
+                throw new ResourceNotFoundException("No person found with ID: " + personId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -77,16 +78,16 @@ public class PersonResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData addPerson(Person person) {
+    public ResultData<Person> addPerson(Person person) {
         try {
             List<Person> persons = personDAO.getAllPersons();
             int prevPersonListSize = persons.size();
             personDAO.addPerson(person);
             if (persons.size() > prevPersonListSize) {
                 LOGGER.info("New person added successfully!");
-                return new ResultWithNoData("New person added successfully!", "success");
+                return new ResultData(personDAO.findPersonById(persons.size()), "New person added successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("Failed to add a new person!");
+                throw new ResourceNotFoundException("Failed to add a new person!", Response.Status.NOT_FOUND);
             }
 
         } catch (InternalServerErrorException e) {
@@ -98,7 +99,7 @@ public class PersonResource {
     @Path("/{personId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData updatePerson(@PathParam("personId") int personId, Person updatePerson) {
+    public ResultData<Person> updatePerson(@PathParam("personId") int personId, Person updatePerson) {
         try {
             Person existingPerson = personDAO.findPersonById(personId);
 
@@ -106,9 +107,9 @@ public class PersonResource {
                 updatePerson.setId(personId);
                 personDAO.updatePerson(updatePerson);
                 LOGGER.info("Person with ID {} updated successfully!", personId);
-                return new ResultWithNoData("Person with ID " + personId + " updated successfully!", "success");
+                return new ResultData(personDAO.findPersonById(personId), "Person with ID " + personId + " updated successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No person found with ID: " + personId);
+                throw new ResourceNotFoundException("No person found with ID: " + personId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -125,9 +126,9 @@ public class PersonResource {
                 personDAO.deletePerson(personId);
                 LOGGER.info("Person with ID {} removed successfully!", personId);
 
-                return new ResultWithNoData("Person with ID " + personId + " removed successfully!", "success");
+                return new ResultWithNoData("Person with ID " + personId + " removed successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No person found with ID: " + personId);
+                throw new ResourceNotFoundException("No person found with ID: " + personId, Response.Status.NOT_FOUND);
             }
 
         } catch (InternalServerErrorException e) {

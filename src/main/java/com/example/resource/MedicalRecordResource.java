@@ -22,6 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +49,9 @@ public class MedicalRecordResource {
             LOGGER.info("{} medical records fetched", medicalRecords.size());
 
             if (medicalRecords.isEmpty()) {
-                throw new ResourceNotFoundException("No medical records found!");
+                throw new ResourceNotFoundException("No medical records found!", Response.Status.NOT_FOUND);
             } else {
-                return new ResultData<>(medicalRecords, "Medical records fetched successfully!", "success");
+                return new ResultData<>(medicalRecords, "Medical records fetched successfully!", Response.Status.OK);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -67,9 +68,9 @@ public class MedicalRecordResource {
             MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordById(medicalRecordId);
             if (medicalRecord != null) {
                 LOGGER.info("Medical record with ID {} fetched successfully!", medicalRecordId);
-                return new ResultData<>(medicalRecord, "Medical record with " + medicalRecordId + " fetched successfully!", "success");
+                return new ResultData<>(medicalRecord, "Medical record with " + medicalRecordId + " fetched successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId);
+                throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -87,12 +88,12 @@ public class MedicalRecordResource {
                 MedicalRecord medicalRecord = medicalRecordDAO.getMedicalRecordByPatientId(patientId);
                 if (medicalRecord != null || medicalRecord.getRecordId() != 0) {
                     LOGGER.info("Medical record with ID {} fetched successfully!", patientId);
-                    return new ResultData<>(medicalRecord, "Medical record with " + patientId + " fetched successfully!", "success");
+                    return new ResultData<>(medicalRecord, "Medical record with " + patientId + " fetched successfully!", Response.Status.OK);
                 } else {
-                    throw new ResourceNotFoundException("No medical record found with patient ID: " + patientId);
+                    throw new ResourceNotFoundException("No medical record found with patient ID: " + patientId, Response.Status.NOT_FOUND);
                 }
             } else {
-                throw new ResourceNotFoundException("Invalid patient ID: " + patientId);
+                throw new ResourceNotFoundException("Invalid patient ID: " + patientId, Response.Status.NOT_FOUND);
 
             }
         } catch (InternalServerErrorException e) {
@@ -104,7 +105,7 @@ public class MedicalRecordResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData addMedicalRecord(MedicalRecord medicalRecord) {
+    public ResultData<MedicalRecord> addMedicalRecord(MedicalRecord medicalRecord) {
         try {
             List<MedicalRecord> medicalRecords = medicalRecordDAO.getAllMedicalRecords();
             int prevMedicalRecordListSize = medicalRecords.size();
@@ -112,9 +113,9 @@ public class MedicalRecordResource {
             medicalRecords = medicalRecordDAO.getAllMedicalRecords();
             if (medicalRecords.size() > prevMedicalRecordListSize) {
                 LOGGER.info("New medical record added successfully!");
-                return new ResultWithNoData("New medical record added successfully!", "success");
+                return new ResultData(medicalRecordDAO.getMedicalRecordById(medicalRecords.size()), "New medical record added successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("Failed to add a new medical record!");
+                throw new ResourceNotFoundException("Failed to add a new medical record!", Response.Status.BAD_REQUEST);
             }
 
         } catch (InternalServerErrorException e) {
@@ -126,7 +127,7 @@ public class MedicalRecordResource {
     @Path("/{medicalRecordId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData updateMedicalRecord(@PathParam("medicalRecordId") int medicalRecordId, MedicalRecord updateMedicalRecord) {
+    public ResultData<MedicalRecord> updateMedicalRecord(@PathParam("medicalRecordId") int medicalRecordId, MedicalRecord updateMedicalRecord) {
         try {
             MedicalRecord existingMedicalRecord = medicalRecordDAO.findMedicalRecordById(medicalRecordId);
 
@@ -134,9 +135,9 @@ public class MedicalRecordResource {
                 updateMedicalRecord.setRecordId(medicalRecordId);
                 medicalRecordDAO.updateMedicalRecord(updateMedicalRecord);
                 LOGGER.info("Medical record with ID {} updated successfully!", medicalRecordId);
-                return new ResultWithNoData("Medical record with ID " + medicalRecordId + " updated successfully!", "success");
+                return new ResultData(medicalRecordDAO.getMedicalRecordById(medicalRecordId), "Medical record with ID " + medicalRecordId + " updated successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId);
+                throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -153,9 +154,9 @@ public class MedicalRecordResource {
                 medicalRecordDAO.deleteMedicalRecord(medicalRecordId);
                 LOGGER.info("Medical record with ID {} removed successfully!", medicalRecordId);
 
-                return new ResultWithNoData("Medical record with ID " + medicalRecordId + " removed successfully!", "success");
+                return new ResultWithNoData("Medical record with ID " + medicalRecordId + " removed successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId);
+                throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId, Response.Status.NOT_FOUND);
             }
 
         } catch (InternalServerErrorException e) {

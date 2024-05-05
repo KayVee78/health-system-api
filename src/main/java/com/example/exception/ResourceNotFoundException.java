@@ -4,13 +4,22 @@
  */
 package com.example.exception;
 
+import javax.ws.rs.core.Response.Status;
+
 /**
  *
  * @author Kithmi
  */
 public class ResourceNotFoundException extends RuntimeException {
 
-    public ResourceNotFoundException(String message) {
+    private final Status status;
+
+    public ResourceNotFoundException(String message, Status status) {
         super(message);
+        this.status = status;
+    }
+    
+    public Status getStatus() {
+        return status;
     }
 }

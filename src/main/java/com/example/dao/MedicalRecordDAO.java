@@ -10,6 +10,7 @@ import com.example.model.MedicalRecord;
 import com.example.model.Patient;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +45,7 @@ public class MedicalRecordDAO {
                     MedicalRecord formattedMedicalRecordObj = new MedicalRecord(recordId, patientDetails, medicalRecord.getReasonToVisit(), medicalRecord.getDiagnosis(), medicalRecord.getMedications(), medicalRecord.getAllergies());
                     formattedMedicalRecordList.add(formattedMedicalRecordObj);
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a medicsl record for patient with ID: " + patientId);
+                    throw new ResourceNotFoundException("Error occurred while finding a medicsl record for patient with ID: " + patientId, Response.Status.NOT_FOUND);
                 }
             }
         }
@@ -62,7 +63,7 @@ public class MedicalRecordDAO {
                     patient.getName());
             formattedMedicalRecord = new MedicalRecord(medicalRecord.getRecordId(), patientDetails, medicalRecord.getReasonToVisit(), medicalRecord.getDiagnosis(), medicalRecord.getMedications(), medicalRecord.getAllergies());
         } else {
-            throw new ResourceNotFoundException("Error occurred while finding a medical record for patient with ID: " + patientId);
+            throw new ResourceNotFoundException("Error occurred while finding a medical record for patient with ID: " + patientId, Response.Status.NOT_FOUND);
         }
         return formattedMedicalRecord;
     }
@@ -72,7 +73,7 @@ public class MedicalRecordDAO {
     }
 
     public void addMedicalRecord(MedicalRecord medicalRecord) {
-        if ((medicalRecord.getPatientId() != null && isNumeric(medicalRecord.getPatientId())) && (medicalRecord.getReasonToVisit() != null && medicalRecord.getReasonToVisit() instanceof String) && (medicalRecord.getDiagnosis() != null && medicalRecord.getDiagnosis() instanceof String) && (medicalRecord.getMedications() != null && medicalRecord.getMedications() instanceof String) && (medicalRecord.getAllergies() != null && medicalRecord.getAllergies() instanceof String)) {
+        if ((medicalRecord.getPatientId() != null && !medicalRecord.getPatientId().isEmpty() && isNumeric(medicalRecord.getPatientId())) && (medicalRecord.getReasonToVisit() != null && !medicalRecord.getReasonToVisit().isEmpty() && medicalRecord.getReasonToVisit() instanceof String) && (medicalRecord.getDiagnosis() != null && !medicalRecord.getDiagnosis().isEmpty() && medicalRecord.getDiagnosis() instanceof String) && (medicalRecord.getMedications() != null && !medicalRecord.getMedications().isEmpty() && medicalRecord.getMedications() instanceof String) && (medicalRecord.getAllergies() != null && !medicalRecord.getAllergies().isEmpty() && medicalRecord.getAllergies() instanceof String)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
                 if (patient.getId() == Integer.parseInt(medicalRecord.getPatientId())) {
@@ -81,7 +82,7 @@ public class MedicalRecordDAO {
                 }
             }
             if (!isValidPatient) {
-                throw new ResourceNotFoundException("Invalid patient ID. Failed to add a new medical record!");
+                throw new ResourceNotFoundException("Invalid patient ID. Failed to add a new medical record!", Response.Status.NOT_FOUND);
             }
 
             int newRecordId = getNextRecordId();
@@ -89,13 +90,13 @@ public class MedicalRecordDAO {
             medicalRecords.add(medicalRecord);
         } else {
             LOGGER.error("Missing mandatory field(s) in medical record data. Failed to add a new medical record!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in medical record data. Failed to add a new medical record!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in medical record data. Failed to add a new medical record!", Response.Status.BAD_REQUEST);
         }
 
     }
 
     public void updateMedicalRecord(MedicalRecord updateMedicalRecord) {
-        if ((updateMedicalRecord.getPatientId() != null && isNumeric(updateMedicalRecord.getPatientId())) && (updateMedicalRecord.getReasonToVisit() != null && updateMedicalRecord.getReasonToVisit() instanceof String) && (updateMedicalRecord.getDiagnosis() != null && updateMedicalRecord.getDiagnosis() instanceof String) && (updateMedicalRecord.getMedications() != null && updateMedicalRecord.getMedications() instanceof String) && (updateMedicalRecord.getAllergies() != null && updateMedicalRecord.getAllergies() instanceof String)) {
+        if ((updateMedicalRecord.getPatientId() != null && !updateMedicalRecord.getPatientId().isEmpty() && isNumeric(updateMedicalRecord.getPatientId())) && (updateMedicalRecord.getReasonToVisit() != null && !updateMedicalRecord.getReasonToVisit().isEmpty() && updateMedicalRecord.getReasonToVisit() instanceof String) && (updateMedicalRecord.getDiagnosis() != null && !updateMedicalRecord.getDiagnosis().isEmpty() && updateMedicalRecord.getDiagnosis() instanceof String) && (updateMedicalRecord.getMedications() != null && !updateMedicalRecord.getMedications().isEmpty() && updateMedicalRecord.getMedications() instanceof String) && (updateMedicalRecord.getAllergies() != null && !updateMedicalRecord.getAllergies().isEmpty() && updateMedicalRecord.getAllergies() instanceof String)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
                 if (patient.getId() == Integer.parseInt(updateMedicalRecord.getPatientId())) {
@@ -112,11 +113,11 @@ public class MedicalRecordDAO {
                     }
                 }
             } else {
-                throw new ResourceNotFoundException("Error occured while updating a medical record. No patient found with ID: " + updateMedicalRecord.getPatientId());
+                throw new ResourceNotFoundException("Error occured while updating a medical record. No patient found with ID: " + updateMedicalRecord.getPatientId(), Response.Status.NOT_FOUND);
             }
         } else {
             LOGGER.error("Missing mandatory field(s) in medical record data. Failed to update the medical record!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in medical record data. Failed to update the medical record!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in medical record data. Failed to update the medical record!", Response.Status.BAD_REQUEST);
         }
 
     }

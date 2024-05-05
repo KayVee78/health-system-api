@@ -5,11 +5,10 @@
 package com.example.dao;
 
 import com.example.exception.ResourceNotFoundException;
-import com.example.model.MedicalRecord;
 import com.example.model.Patient;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,19 +41,19 @@ public class PatientDAO {
     }
 
     public void addPatient(Patient patient) {
-        if ((patient.getName() != null && patient.getName() instanceof String) && (patient.getAddress() != null && patient.getAddress() instanceof String) && (patient.getContactInfo() != null && patient.getContactInfo() instanceof String) && (patient.getMedicalHistory() != null && patient.getMedicalHistory() instanceof List) && (patient.getCurrentHealthStatus() != null && patient.getCurrentHealthStatus() instanceof String)) {
+        if (patient.getAge() > 0 && (patient.getName() != null && patient.getName() instanceof String && !patient.getName().isEmpty()) && (patient.getAddress() != null && patient.getAddress() instanceof String && !patient.getAddress().isEmpty()) && (patient.getContactInfo() != null && patient.getContactInfo() instanceof String && !patient.getContactInfo().isEmpty()) && (patient.getMedicalHistory() != null && patient.getMedicalHistory() instanceof List) && (patient.getCurrentHealthStatus() != null && patient.getCurrentHealthStatus() instanceof String && !patient.getCurrentHealthStatus().isEmpty())) {
             int newUserId = getNextUserId();
             patient.setId(newUserId);
             patients.add(patient);
         } else {
             LOGGER.error("Missing mandatory field(s) in patient data. Failed to add a new Patient!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in patient data. Failed to add a new Patient!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in patient data. Failed to add a new Patient!", Response.Status.BAD_REQUEST);
         }
 
     }
 
     public void updatePatient(Patient updatePatient) {
-        if ((updatePatient.getName() != null && updatePatient.getName() instanceof String) && (updatePatient.getAddress() != null && updatePatient.getAddress() instanceof String) && (updatePatient.getContactInfo() != null && updatePatient.getContactInfo() instanceof String) && (updatePatient.getMedicalHistory() != null && updatePatient.getMedicalHistory() instanceof List) && (updatePatient.getCurrentHealthStatus() != null && updatePatient.getCurrentHealthStatus() instanceof String)) {
+        if (updatePatient.getAge() > 0 && (updatePatient.getName() != null && updatePatient.getName() instanceof String && !updatePatient.getName().isEmpty()) && (updatePatient.getAddress() != null && updatePatient.getAddress() instanceof String && !updatePatient.getAddress().isEmpty()) && (updatePatient.getContactInfo() != null && updatePatient.getContactInfo() instanceof String && !updatePatient.getContactInfo().isEmpty()) && (updatePatient.getMedicalHistory() != null && updatePatient.getMedicalHistory() instanceof List) && (updatePatient.getCurrentHealthStatus() != null && updatePatient.getCurrentHealthStatus() instanceof String && !updatePatient.getCurrentHealthStatus().isEmpty())) {
             for (int i = 0; i < patients.size(); i++) {
                 Patient patient = patients.get(i);
                 if (patient.getId() == updatePatient.getId()) {
@@ -64,7 +63,7 @@ public class PatientDAO {
             }
         } else {
             LOGGER.error("Missing mandatory field(s) in patient data. Failed to update Patient!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in patient data. Failed to update Patient!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in patient data. Failed to update Patient!", Response.Status.BAD_REQUEST);
         }
     }
 
@@ -96,5 +95,14 @@ public class PatientDAO {
             maxUserId = 1;
         }
         return maxUserId;
+    }
+
+    private boolean isValidNumber(String age) {
+        try {
+            Integer.parseInt(age);
+            return true;
+        } catch (NumberFormatException e) {
+            return false;
+        }
     }
 }

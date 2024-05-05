@@ -26,7 +26,7 @@ public class InternalServerErrorExceptionMapper implements
         LOGGER.error("InternalServerErrorException caught: {}",
                 exception.getMessage(), exception);
         String responseJson = "{"
-                + "\"status\": fail,"
+                + "\"status\": \"" + Response.Status.INTERNAL_SERVER_ERROR + "\","
                 + "\"message\": \"" + exception.getMessage() + "\","
                 + "}";
 

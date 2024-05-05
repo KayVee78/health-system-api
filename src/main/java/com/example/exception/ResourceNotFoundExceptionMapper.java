@@ -28,14 +28,17 @@ public class ResourceNotFoundExceptionMapper implements
     public Response toResponse(ResourceNotFoundException exception) {
         LOGGER.error("ResourceNotFoundException caught: {}",
                 exception.getMessage(), exception);
+        Response.Status status = exception.getStatus();
+        int statusCode = status.getStatusCode();
+
         String responseJson = "{"
-                + "\"status\": fail,"
+                + "\"status\": \"" + statusCode + " - " + exception.getStatus() + "\","
                 + "\"message\": \"" + exception.getMessage() + "\","
                 + "\"data\": {}"
                 + "}";
 
         // Return the response
-        return Response.status(Response.Status.NOT_FOUND)
+        return Response.status(exception.getStatus())
                 .entity(responseJson)
                 .type(MediaType.APPLICATION_JSON)
                 .build();

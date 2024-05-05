@@ -4,6 +4,8 @@
  */
 package com.example.result;
 
+import javax.ws.rs.core.Response.Status;
+
 /**
  *
  * @author Kithmi
@@ -11,12 +13,12 @@ package com.example.result;
 public class ResultWithNoData<T> {
 
     private String message;
-    private String status;
+    private Status status;
 
     public ResultWithNoData() {
     }
 
-    public ResultWithNoData(String message, String status) {
+    public ResultWithNoData(String message, Status status) {
         this.message = message;
         this.status = status;
     }
@@ -25,14 +27,14 @@ public class ResultWithNoData<T> {
         return message;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
     @Override
     public String toString() {
         StringBuilder responseJson = new StringBuilder("{");
-        responseJson.append("\"status\": \"").append(status).append("\",");
+        responseJson.append("\"status\": \"").append(status.getStatusCode()).append(" - ").append(status).append("\",");
         responseJson.append("\"message\": \"").append(message).append("\"}");
         return responseJson.toString();
     }
