@@ -135,5 +135,4 @@ public class PersonResource {
             throw new InternalServerErrorException("Internal Server Error occured");
         }
     }
-
 }

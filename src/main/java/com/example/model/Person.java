@@ -10,11 +10,13 @@ package com.example.model;
  */
 public class Person {
     
+    //ATTRIBUTES
     int id;
     private String name;
     private String contactInfo;
     private String address;
 
+    //CONSTRUCTORS
     public Person() {
     }
 
@@ -29,10 +31,11 @@ public class Person {
         this.id = id;
     }
 
+    //GETTERS AND SETTERS
     public String getName() {
         return name;
     }
-
+    
     public void setName(String name) {
         this.name = name;
     }

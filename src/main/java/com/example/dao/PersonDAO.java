@@ -20,6 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PersonDAO {
 
+    //static list to store person objects
     public static List<Person> persons = new ArrayList<>();
     private static final Logger LOGGER = LoggerFactory.getLogger(PersonDAO.class);
 
@@ -28,14 +29,17 @@ public class PersonDAO {
         persons.add(new Person(2, "Kasuntha Perera", "0712359807", "Colombo-04"));
     }
 
+    //Method to retrieve all the persons inserted to the list
     public List<Person> getAllPersons() {
         return persons;
     }
 
+    //Method to delete the person on provided id
     public void deletePerson(int id) {
         persons.removeIf(person -> person.getId() == id);
     }
 
+    //Method to add a new person record to the list
     public void addPerson(Person person) {
         if ((person.getName() != null && person.getName() instanceof String && !person.getName().isEmpty()) && (person.getAddress() != null && person.getAddress() instanceof String && !person.getAddress().isEmpty()) && (person.getContactInfo() != null && person.getContactInfo() instanceof String && !person.getContactInfo().isEmpty())) {
             int newUserId = getNextUserId();
@@ -48,6 +52,7 @@ public class PersonDAO {
 
     }
 
+    //Method to update an existing person object on provided id
     public void updatePerson(Person updatePerson) {
         if ((updatePerson.getName() != null && updatePerson.getName() instanceof String && !updatePerson.getName().isEmpty()) && (updatePerson.getAddress() != null && updatePerson.getAddress() instanceof String && !updatePerson.getAddress().isEmpty()) && (updatePerson.getContactInfo() != null && updatePerson.getContactInfo() instanceof String && !updatePerson.getContactInfo().isEmpty())) {
             for (int i = 0; i < persons.size(); i++) {
