@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,32 +30,31 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/appointments")
 public class AppointmentResource {
-
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(AppointmentResource.class);
-
+    
     private AppointmentDAO appointmentDAO = new AppointmentDAO();
-
+    
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public ResultData<List<Appointment>> getAllAppointments() {
-
+        
         try {
             LOGGER.info("Fetching all the appointments");
-
+            
             List<Appointment> appointments = appointmentDAO.getAllAppointments();
             LOGGER.info("{} appointments fetched", appointments.size());
-
+            
             if (appointments.isEmpty()) {
-                throw new ResourceNotFoundException("No appointments found!");
+                throw new ResourceNotFoundException("No appointments found!", Response.Status.NOT_FOUND);
             } else {
-                return new ResultData<>(appointments, "Appointments fetched successfully!", "success");
+                return new ResultData<>(appointments, "Appointments fetched successfully!", Response.Status.OK);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
         }
-
     }
-
+    
     @GET
     @Path("/{appointmentId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -64,57 +64,57 @@ public class AppointmentResource {
             Appointment appointment = appointmentDAO.findAppointmentById(appointmentId);
             if (appointment != null) {
                 LOGGER.info("Appointment with ID {} fetched successfully!", appointmentId);
-                return new ResultData<>(appointment, "Appointment with " + appointmentId + " fetched successfully!", "success");
+                return new ResultData<>(appointment, "Appointment with " + appointmentId + " fetched successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No appointment found with ID: " + appointmentId);
+                throw new ResourceNotFoundException("No appointment found with ID: " + appointmentId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal server error occured");
         }
-
+        
     }
-
+    
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData addAppointment(Appointment appointment) {
+    public ResultData<Appointment> addAppointment(Appointment appointment) {
         try {
             List<Appointment> appointments = appointmentDAO.getNonModifiedAppointmentList();
             int prevAppointmentListSize = appointments.size();
             appointmentDAO.addAppointment(appointment);
             if (appointments.size() > prevAppointmentListSize) {
                 LOGGER.info("New appointment added successfully!");
-                return new ResultWithNoData("New appointment added successfully!", "success");
+                return new ResultData(appointmentDAO.findAppointmentById(appointments.size()), "New appointment added successfully!", Response.Status.CREATED);
             } else {
-                throw new ResourceNotFoundException("Failed to add a new appointment!");
+                throw new ResourceNotFoundException("Failed to add a new appointment!", Response.Status.BAD_REQUEST);
             }
-
+            
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
         }
     }
-
+    
     @PUT
     @Path("/{appointmentId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData updateAppointment(@PathParam("appointmentId") int appointmentId, Appointment updateAppointment) {
+    public ResultData<Appointment> updateAppointment(@PathParam("appointmentId") int appointmentId, Appointment updateAppointment) {
         try {
             Appointment existingAppointment = appointmentDAO.findAppointmentById(appointmentId);
-
+            
             if (existingAppointment != null) {
                 updateAppointment.setAppointmentId(appointmentId);
                 appointmentDAO.updateAppointmentData(updateAppointment);
                 LOGGER.info("Appointment with ID {} updated successfully!", appointmentId);
-                return new ResultWithNoData("Appointment with ID " + appointmentId + " updated successfully!", "success");
+                return new ResultData(appointmentDAO.findAppointmentById(appointmentId), "Appointment with ID " + appointmentId + " updated successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No appointment found with ID: " + appointmentId);
+                throw new ResourceNotFoundException("No appointment found with ID: " + appointmentId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
         }
     }
-
+    
     @DELETE
     @Produces(MediaType.APPLICATION_JSON)
     @Path("/{appointmentId}")
@@ -124,12 +124,12 @@ public class AppointmentResource {
             if (appointment != null) {
                 appointmentDAO.deleteAppointment(appointmentId);
                 LOGGER.info("Appointment with ID {} removed successfully!", appointmentId);
-
-                return new ResultWithNoData("Appointment with ID " + appointmentId + " removed successfully!", "success");
+                
+                return new ResultWithNoData("Appointment with ID " + appointmentId + " removed successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No appointment found with ID: " + appointmentId);
+                throw new ResourceNotFoundException("No appointment found with ID: " + appointmentId, Response.Status.NOT_FOUND);
             }
-
+            
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
         }

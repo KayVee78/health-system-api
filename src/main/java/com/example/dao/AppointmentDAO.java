@@ -10,6 +10,7 @@ import com.example.model.Doctor;
 import com.example.model.Patient;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class AppointmentDAO {
                     formattedAppontmentList.add(formattedAppointmentObj);
 
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a doctor or patient with IDs");
+                    throw new ResourceNotFoundException("Error occurred while finding a doctor or patient with IDs", Response.Status.NOT_FOUND);
                 }
             }
         }
@@ -63,7 +64,7 @@ public class AppointmentDAO {
     }
 
     public void addAppointment(Appointment appointment) {
-        if (appointment.getPatient().getId() > 0 && appointment.getDoctor().getId() > 0 && (appointment.getDate() instanceof String && appointment.getDate() != null) && (appointment.getTime() instanceof String && appointment.getTime() != null)) {
+        if (appointment.getPatient().getId() > 0 && appointment.getDoctor().getId() > 0 && (appointment.getDate() instanceof String && !appointment.getDate().isEmpty() && appointment.getDate() != null) && (appointment.getTime() instanceof String && !appointment.getTime().isEmpty() && appointment.getTime() != null)) {
             boolean isValidPatientId = false;
             boolean isValidDoctorId = false;
             for (Patient patient : PatientDAO.patients) {
@@ -81,13 +82,13 @@ public class AppointmentDAO {
             }
 
             if (!isValidDoctorId && !isValidPatientId) {
-                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with the ID " + appointment.getPatient().getId() + " and no doctor found with the ID " + appointment.getDoctor().getId());
+                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with the ID " + appointment.getPatient().getId() + " and no doctor found with the ID " + appointment.getDoctor().getId(), Response.Status.NOT_FOUND);
             }
             if (!isValidPatientId) {
-                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with ID: " + appointment.getPatient().getId());
+                throw new ResourceNotFoundException("Error occured while adding a new appointment. No patient found with ID: " + appointment.getPatient().getId(), Response.Status.NOT_FOUND);
             }
             if (!isValidDoctorId) {
-                throw new ResourceNotFoundException("Error occured while adding a new appointment. No doctor found with ID: " + appointment.getDoctor().getId());
+                throw new ResourceNotFoundException("Error occured while adding a new appointment. No doctor found with ID: " + appointment.getDoctor().getId(), Response.Status.NOT_FOUND);
             }
 
             int newAppointmentId = getNextAppointmentId();
@@ -97,13 +98,13 @@ public class AppointmentDAO {
             return;
         } else {
             LOGGER.error("Missing mandatory field(s) in appointment data. Failed to add a new Appointment!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in appointment data. Failed to add a new Appointment!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in appointment data. Failed to add a new Appointment!", Response.Status.BAD_REQUEST);
         }
 
     }
 
     public void updateAppointmentData(Appointment updateAppointment) {
-        if (updateAppointment.getPatient().getId() > 0 && updateAppointment.getDoctor().getId() > 0 && (updateAppointment.getDate() instanceof String && updateAppointment.getDate() != null) && (updateAppointment.getTime() instanceof String && updateAppointment.getTime() != null)) {
+        if (updateAppointment.getPatient().getId() > 0 && updateAppointment.getDoctor().getId() > 0 && (updateAppointment.getDate() instanceof String && !updateAppointment.getDate().isEmpty() && updateAppointment.getDate() != null) && (updateAppointment.getTime() instanceof String && !updateAppointment.getTime().isEmpty() && updateAppointment.getTime() != null)) {
             boolean isValidPatientId = false;
             boolean isValidDoctorId = false;
             for (Patient patient : PatientDAO.patients) {
@@ -121,13 +122,13 @@ public class AppointmentDAO {
             }
 
             if (!isValidDoctorId && !isValidPatientId) {
-                throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with the ID " + updateAppointment.getPatient().getId() + " and no doctor found with the ID " + updateAppointment.getDoctor().getId());
+                throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with the ID " + updateAppointment.getPatient().getId() + " and no doctor found with the ID " + updateAppointment.getDoctor().getId(), Response.Status.NOT_FOUND);
             }
             if (!isValidPatientId) {
-                throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with ID: " + updateAppointment.getPatient().getId());
+                throw new ResourceNotFoundException("Error occured while updating an appointment. No patient found with ID: " + updateAppointment.getPatient().getId(), Response.Status.NOT_FOUND);
             }
             if (!isValidDoctorId) {
-                throw new ResourceNotFoundException("Error occured while updating an appointment. No doctor found with ID: " + updateAppointment.getDoctor().getId());
+                throw new ResourceNotFoundException("Error occured while updating an appointment. No doctor found with ID: " + updateAppointment.getDoctor().getId(), Response.Status.NOT_FOUND);
             }
 
             for (int i = 0; i < appointments.size(); i++) {
@@ -163,7 +164,7 @@ public class AppointmentDAO {
                     appointmentDataFound = formattedAppointmentObj;
                     break;
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a doctor or patient with IDs");
+                    throw new ResourceNotFoundException("Error occurred while finding a doctor or patient with IDs", Response.Status.NOT_FOUND);
                 }
             }
         }

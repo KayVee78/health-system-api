@@ -4,7 +4,8 @@
  */
 package com.example.result;
 
-import java.util.Objects;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 /**
  *
@@ -14,17 +15,17 @@ public class ResultData<T> {
 
     private T data;
     private String message;
-    private String status;
+    private Status status;
 
     public ResultData() {
     }
 
-    public ResultData(String message, String status) {
+    public ResultData(String message, Status status) {
         this.message = message;
         this.status = status;
     }
 
-    public ResultData(T data, String message, String status) {
+    public ResultData(T data, String message, Status status) {
         this.data = data;
         this.message = message;
         this.status = status;
@@ -38,7 +39,7 @@ public class ResultData<T> {
         return message;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
@@ -53,11 +54,12 @@ public class ResultData<T> {
 //    }
     @Override
     public String toString() {
+        
         StringBuilder responseJson = new StringBuilder("{");
-        responseJson.append("\"status\": \"").append(status).append("\",");
+        responseJson.append("\"status\": \"").append(status.getStatusCode()).append(" - ").append(status).append("\",");
         responseJson.append("\"message\": \"").append(message).append("\"");
 
-        if (data != "null") {
+        if (data != null) {
             responseJson.append(", \"data\": ").append(data);
         }
 

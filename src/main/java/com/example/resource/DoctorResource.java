@@ -20,6 +20,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +46,9 @@ public class DoctorResource {
             LOGGER.info("{} doctors fetched", doctors.size());
 
             if (doctors.isEmpty()) {
-                throw new ResourceNotFoundException("No doctors found!");
+                throw new ResourceNotFoundException("No doctors found!", Response.Status.NOT_FOUND);
             } else {
-                return new ResultData<>(doctors, "Doctors fetched successfully!", "success");
+                return new ResultData<>(doctors, "Doctors fetched successfully!", Response.Status.OK);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -64,9 +65,9 @@ public class DoctorResource {
             Doctor doctor = doctorDAO.findDoctorById(doctorId);
             if (doctor != null) {
                 LOGGER.info("Doctor with ID {} fetched successfully!", doctorId);
-                return new ResultData<>(doctor, "Doctors with " + doctorId + " fetched successfully!", "success");
+                return new ResultData<>(doctor, "Doctors with " + doctorId + " fetched successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No doctor found with ID: " + doctorId);
+                throw new ResourceNotFoundException("No doctor found with ID: " + doctorId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -77,16 +78,16 @@ public class DoctorResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData addDoctor(Doctor doctor) {
+    public ResultData<Doctor> addDoctor(Doctor doctor) {
         try {
             List<Doctor> doctors = doctorDAO.getAllDoctors();
             int prevDoctorListSize = doctors.size();
             doctorDAO.addDoctor(doctor);
             if (doctors.size() > prevDoctorListSize) {
                 LOGGER.info("New doctor added successfully!");
-                return new ResultWithNoData("New doctor added successfully!", "success");
+                return new ResultData(doctorDAO.findDoctorById(doctors.size()), "New doctor added successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("Failed to add a new doctor!");
+                throw new ResourceNotFoundException("Failed to add a new doctor!", Response.Status.BAD_REQUEST);
             }
 
         } catch (InternalServerErrorException e) {
@@ -98,7 +99,7 @@ public class DoctorResource {
     @Path("/{doctorId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData updateDoctor(@PathParam("doctorId") int doctorId, Doctor updateDoctor) {
+    public ResultData<Doctor> updateDoctor(@PathParam("doctorId") int doctorId, Doctor updateDoctor) {
         try {
             Doctor existingDoctor = doctorDAO.findDoctorById(doctorId);
 
@@ -106,9 +107,9 @@ public class DoctorResource {
                 updateDoctor.setId(doctorId);
                 doctorDAO.updateDoctor(updateDoctor);
                 LOGGER.info("Doctor with ID {} updated successfully!", doctorId);
-                return new ResultWithNoData("Doctor with ID " + doctorId + " updated successfully!", "success");
+                return new ResultData(doctorDAO.findDoctorById(doctorId), "Doctor with ID " + doctorId + " updated successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No doctor found with ID: " + doctorId);
+                throw new ResourceNotFoundException("No doctor found with ID: " + doctorId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -125,9 +126,9 @@ public class DoctorResource {
                 doctorDAO.deleteDoctor(doctorId);
                 LOGGER.info("Doctor with ID {} removed successfully!", doctorId);
 
-                return new ResultWithNoData("Doctor with ID " + doctorId + " removed successfully!", "success");
+                return new ResultWithNoData("Doctor with ID " + doctorId + " removed successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No doctor found with ID: " + doctorId);
+                throw new ResourceNotFoundException("No doctor found with ID: " + doctorId, Response.Status.NOT_FOUND);
             }
 
         } catch (InternalServerErrorException e) {

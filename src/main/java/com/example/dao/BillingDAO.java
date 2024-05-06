@@ -13,6 +13,7 @@ import com.example.model.Invoice;
 import com.example.model.Patient;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +46,7 @@ public class BillingDAO {
     }
 
     public void addBillingData(Billing bill) {
-        if (bill.getAppointmentId() > 0 && (bill.getInvoiceInfo() instanceof Invoice && bill.getInvoiceInfo() != null) && bill.getAmountPaid() > 0 && (bill.getInvoiceInfo().getDate() instanceof String && bill.getInvoiceInfo().getDate() != null)) {
+        if (bill.getAppointmentId() > 0 && (bill.getInvoiceInfo() instanceof Invoice && bill.getInvoiceInfo() != null) && bill.getAmountPaid() > 0 && (bill.getInvoiceInfo().getDate() instanceof String && !bill.getInvoiceInfo().getDate().isEmpty() && bill.getInvoiceInfo().getDate() != null)) {
             boolean isValidAppointmentId = false;
             for (Appointment appointment : AppointmentDAO.appointments) {
                 if (appointment.getAppointmentId() == bill.getAppointmentId()) {
@@ -70,21 +71,21 @@ public class BillingDAO {
                     }
 
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding the doctor or patient of the respectiive appointment ID");
+                    throw new ResourceNotFoundException("Error occurred while finding the doctor or patient of the respectiive appointment ID", Response.Status.NOT_FOUND);
 
                 }
             } else {
-                throw new ResourceNotFoundException("No appointment found with ID: " + bill.getAppointmentId());
+                throw new ResourceNotFoundException("No appointment found with ID: " + bill.getAppointmentId(), Response.Status.NOT_FOUND);
             }
         } else {
             LOGGER.error("Missing mandatory field(s) in billing data. Failed to add a new Bill!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in billing data. Failed to add a new Bill!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in billing data. Failed to add a new Bill!", Response.Status.BAD_REQUEST);
         }
 
     }
 
     public void updateBillingData(Billing updateBill) {
-        if (updateBill.getAppointmentId() > 0 && (updateBill.getInvoiceInfo() instanceof Invoice && updateBill.getInvoiceInfo() != null) && updateBill.getAmountPaid() > 0 && (updateBill.getInvoiceInfo().getDate() instanceof String && updateBill.getInvoiceInfo().getDate() != null)) {
+        if (updateBill.getAppointmentId() > 0 && (updateBill.getInvoiceInfo() instanceof Invoice && updateBill.getInvoiceInfo() != null) && updateBill.getAmountPaid() > 0 && (updateBill.getInvoiceInfo().getDate() instanceof String && !updateBill.getInvoiceInfo().getDate().isEmpty() && updateBill.getInvoiceInfo().getDate() != null)) {
             boolean isValidAppointmentId = false;
             Billing formattedUpdateBill = null;
             for (Appointment appointment : AppointmentDAO.appointments) {
@@ -115,17 +116,17 @@ public class BillingDAO {
                             }
                         }
                     } else {
-                        throw new ResourceNotFoundException("Amount paid is not sufficient to the complete the bill payment process");
+                        throw new ResourceNotFoundException("Amount paid is not sufficient to the complete the bill payment process", Response.Status.BAD_REQUEST);
                     }
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding the doctor or patient of the respectiive appointment ID");
+                    throw new ResourceNotFoundException("Error occurred while finding the doctor or patient of the respectiive appointment ID", Response.Status.NOT_FOUND);
                 }
             } else {
-                throw new ResourceNotFoundException("No appointment found with ID: " + updateBill.getAppointmentId());
+                throw new ResourceNotFoundException("No appointment found with ID: " + updateBill.getAppointmentId(), Response.Status.NOT_FOUND);
             }
         } else {
             LOGGER.error("Missing mandatory field(s) in billing data. Failed to update Bill!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in billing data. Failed to update Bill!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in billing data. Failed to update Bill!", Response.Status.BAD_REQUEST);
         }
     }
 

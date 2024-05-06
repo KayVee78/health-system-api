@@ -9,6 +9,7 @@ import com.example.model.Doctor;
 import com.example.resource.DoctorResource;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,19 +36,19 @@ public class DoctorDAO {
     }
 
     public void addDoctor(Doctor doctor) {
-        if ((doctor.getName() != null && doctor.getName() instanceof String) && (doctor.getAddress() != null && doctor.getAddress() instanceof String) && (doctor.getContactInfo() != null && doctor.getContactInfo() instanceof String) && (doctor.getSpecialization() != null && doctor.getSpecialization() instanceof String) && doctor.getDoctorFee() > 0) {
+        if ((doctor.getName() != null && doctor.getName() instanceof String && !doctor.getName().isEmpty()) && (doctor.getAddress() != null && doctor.getAddress() instanceof String && !doctor.getAddress().isEmpty()) && (doctor.getContactInfo() != null && doctor.getContactInfo() instanceof String && !doctor.getContactInfo().isEmpty()) && (doctor.getSpecialization() != null && doctor.getSpecialization() instanceof String && !doctor.getSpecialization().isEmpty()) && doctor.getDoctorFee() > 0) {
             int newUserId = getNextUserId();
             doctor.setId(newUserId);
             doctors.add(doctor);
         } else {
             LOGGER.error("Missing mandatory field(s) in doctor data. Failed to add a new Doctor!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in doctor data. Failed to add a new Doctor!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in doctor data. Failed to add a new Doctor!", Response.Status.BAD_REQUEST);
         }
 
     }
 
     public void updateDoctor(Doctor updateDoctor) {
-        if ((updateDoctor.getName() != null && updateDoctor.getName() instanceof String) && (updateDoctor.getAddress() != null && updateDoctor.getAddress() instanceof String) && (updateDoctor.getContactInfo() != null && updateDoctor.getContactInfo() instanceof String) && (updateDoctor.getSpecialization() != null && updateDoctor.getSpecialization() instanceof String) && updateDoctor.getDoctorFee() > 0) {
+        if ((updateDoctor.getName() != null && updateDoctor.getName() instanceof String && !updateDoctor.getName().isEmpty()) && (updateDoctor.getAddress() != null && updateDoctor.getAddress() instanceof String && !updateDoctor.getAddress().isEmpty()) && (updateDoctor.getContactInfo() != null && updateDoctor.getContactInfo() instanceof String && !updateDoctor.getContactInfo().isEmpty()) && (updateDoctor.getSpecialization() != null && updateDoctor.getSpecialization() instanceof String && !updateDoctor.getSpecialization().isEmpty()) && updateDoctor.getDoctorFee() > 0) {
             for (int i = 0; i < doctors.size(); i++) {
                 Doctor doctor = doctors.get(i);
                 if (doctor.getId() == updateDoctor.getId()) {
@@ -57,9 +58,8 @@ public class DoctorDAO {
             }
         } else {
             LOGGER.error("Missing mandatory field(s) in doctor data. Failed to update the Doctor!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in doctor data. Failed to update the Doctor!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in doctor data. Failed to update the Doctor!", Response.Status.BAD_REQUEST);
         }
-
     }
 
     //HELPER METHODS

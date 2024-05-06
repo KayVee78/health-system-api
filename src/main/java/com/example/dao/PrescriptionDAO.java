@@ -10,6 +10,7 @@ import com.example.model.Patient;
 import com.example.model.Prescription;
 import java.util.ArrayList;
 import java.util.List;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,7 @@ public class PrescriptionDAO {
                     Prescription formattedPrescriptionObj = new Prescription(prescription.getPrescriptionId(), patientDetails, prescription.getMedication());
                     formattedPrescriptionList.add(formattedPrescriptionObj);
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a prescription for patient with ID: " + patientId);
+                    throw new ResourceNotFoundException("Error occurred while finding a prescription for patient with ID: " + patientId + "", Response.Status.NOT_FOUND);
                 }
             }
         }
@@ -61,7 +62,7 @@ public class PrescriptionDAO {
                     patient.getName());
             formattedPrescription = new Prescription(id, patientDetails, prescription.getMedication());
         } else {
-            throw new ResourceNotFoundException("Error occurred while finding a prescription for patient with ID: " + patientId);
+            throw new ResourceNotFoundException("Error occurred while finding a prescription for patient with ID: " + patientId, Response.Status.NOT_FOUND);
         }
         return formattedPrescription;
     }
@@ -71,7 +72,7 @@ public class PrescriptionDAO {
     }
 
     public void addPrescription(Prescription prescription) {
-        if ((prescription.getPatientId() != null && isNumeric(prescription.getPatientId())) && (prescription.getMedication() != null && prescription.getMedication() instanceof List)) {
+        if ((prescription.getPatientId() != null && isNumeric(prescription.getPatientId())) && (prescription.getMedication() != null && !prescription.getMedication().isEmpty() && prescription.getMedication() instanceof List)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
                 if (patient.getId() == Integer.parseInt(prescription.getPatientId())) {
@@ -80,7 +81,7 @@ public class PrescriptionDAO {
                 }
             }
             if (!isValidPatient) {
-                throw new ResourceNotFoundException("Invalid patient ID. Failed to add a new prescription!");
+                throw new ResourceNotFoundException("Invalid patient ID. Failed to add a new prescription!", Response.Status.NOT_FOUND);
             }
 
             int newPrescriptionId = getNextPrescriptionId();
@@ -88,13 +89,13 @@ public class PrescriptionDAO {
             prescriptions.add(prescription);
         } else {
             LOGGER.error("Missing mandatory field(s) in prescription data. Failed to add a prescription!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in prescription data. Failed to add a new prescription!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in prescription data. Failed to add a new prescription!", Response.Status.BAD_REQUEST);
         }
 
     }
 
     public void updatePrescription(Prescription updatePrescription) {
-        if ((updatePrescription.getPatientId() != null && isNumeric(updatePrescription.getPatientId())) && (updatePrescription.getMedication() != null && updatePrescription.getMedication() instanceof List)) {
+        if ((updatePrescription.getPatientId() != null && isNumeric(updatePrescription.getPatientId())) && (updatePrescription.getMedication() != null && !updatePrescription.getMedication().isEmpty() && updatePrescription.getMedication() instanceof List)) {
 
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
@@ -112,11 +113,11 @@ public class PrescriptionDAO {
                     }
                 }
             } else {
-                throw new ResourceNotFoundException("Error occured while updating a prescription. No patient found with ID: " + updatePrescription.getPatientId());
+                throw new ResourceNotFoundException("Error occured while updating a prescription. No patient found with ID: " + updatePrescription.getPatientId(), Response.Status.NOT_FOUND);
             }
         } else {
             LOGGER.error("Missing mandatory field(s) in prescription data. Failed to update prescription!");
-            throw new ResourceNotFoundException("Missing mandatory field(s) in prescription data. Failed to update prescription!");
+            throw new ResourceNotFoundException("Missing mandatory field(s) in prescription data. Failed to update prescription!", Response.Status.BAD_REQUEST);
         }
     }
 

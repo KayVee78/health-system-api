@@ -22,6 +22,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,9 +49,9 @@ public class BillingResource {
             LOGGER.info("{} bills fetched", bills.size());
 
             if (bills.isEmpty()) {
-                throw new ResourceNotFoundException("No bills found!");
+                throw new ResourceNotFoundException("No bills found!", Response.Status.NOT_FOUND);
             } else {
-                return new ResultData<>(bills, "Bills fetched successfully!", "success");
+                return new ResultData<>(bills, "Bills fetched successfully!", Response.Status.OK);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -67,15 +68,15 @@ public class BillingResource {
             Billing bill = billingDAO.findBillingDataById(billId);
             if (bill != null) {
                 LOGGER.info("Bill with ID {} fetched successfully!", billId);
-                return new ResultData<>(bill, "Bill with " + billId + " fetched successfully!", "success");
+                return new ResultData<>(bill, "Bill with " + billId + " fetched successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No bill found with ID: " + billId);
+                throw new ResourceNotFoundException("No bill found with ID: " + billId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal server error occured");
         }
     }
-    
+
     @GET
     @Path("/appointment/{appointmentId}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -85,9 +86,9 @@ public class BillingResource {
             Billing bill = billingDAO.findBillingDataByAppointmentId(appointmentId);
             if (bill != null) {
                 LOGGER.info("Bill with appointment ID {} fetched successfully!", appointmentId);
-                return new ResultData<>(bill, "Bill with appointment ID" + appointmentId + " fetched successfully!", "success");
+                return new ResultData<>(bill, "Bill with appointment ID" + appointmentId + " fetched successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No bill found with appointment ID: " + appointmentId);
+                throw new ResourceNotFoundException("No bill found with appointment ID: " + appointmentId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal server error occured");
@@ -97,16 +98,16 @@ public class BillingResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData addBilling(Billing bill) {
+    public ResultData<Billing> addBilling(Billing bill) {
         try {
             List<Billing> bills = billingDAO.getNonModifiedBillingList();
             int prevBillingListSize = bills.size();
             billingDAO.addBillingData(bill);
             if (bills.size() > prevBillingListSize) {
                 LOGGER.info("New bill added successfully!");
-                return new ResultWithNoData("New bill added successfully!", "success");
+                return new ResultData(billingDAO.findBillingDataById(bills.size()), "New bill added successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("Failed to add a new bill!");
+                throw new ResourceNotFoundException("Failed to add a new bill!", Response.Status.BAD_REQUEST);
             }
 
         } catch (InternalServerErrorException e) {
@@ -118,7 +119,7 @@ public class BillingResource {
     @Path("/{billId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultWithNoData updateBilling(@PathParam("billId") int billId, Billing updateBilling) {
+    public ResultData<Billing> updateBilling(@PathParam("billId") int billId, Billing updateBilling) {
         try {
             Billing existingBilling = billingDAO.findBillingDataById(billId);
 
@@ -126,9 +127,9 @@ public class BillingResource {
                 updateBilling.setBillingId(billId);
                 billingDAO.updateBillingData(updateBilling);
                 LOGGER.info("Bill with ID {} updated successfully!", billId);
-                return new ResultWithNoData("Bill with ID " + billId + " updated successfully!", "success");
+                return new ResultData(billingDAO.findBillingDataById(billId), "Bill with ID " + billId + " updated successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No bill found with ID: " + billId);
+                throw new ResourceNotFoundException("No bill found with ID: " + billId, Response.Status.NOT_FOUND);
             }
         } catch (InternalServerErrorException e) {
             throw new InternalServerErrorException("Internal Server Error occured");
@@ -145,9 +146,9 @@ public class BillingResource {
                 billingDAO.deleteBillingData(billId);
                 LOGGER.info("Bill with ID {} removed successfully!", billId);
 
-                return new ResultWithNoData("Bill with ID " + billId + " removed successfully!", "success");
+                return new ResultWithNoData("Bill with ID " + billId + " removed successfully!", Response.Status.OK);
             } else {
-                throw new ResourceNotFoundException("No bill found with ID: " + billId);
+                throw new ResourceNotFoundException("No bill found with ID: " + billId, Response.Status.NOT_FOUND);
             }
 
         } catch (InternalServerErrorException e) {
