@@ -25,6 +25,12 @@ public class Person {
         this.address = address;
     }
 
+    public Person(String name, String contactInfo, String address) {
+        this.name = name;
+        this.contactInfo = contactInfo;
+        this.address = address;
+    }
+
     public Person(int id) {
         this.id = id;
     }

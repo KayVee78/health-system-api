@@ -78,14 +78,14 @@ public class PersonResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Person> addPerson(Person person) {
+    public ResultWithNoData addPerson(Person person) {
         try {
             List<Person> persons = personDAO.getAllPersons();
             int prevPersonListSize = persons.size();
             personDAO.addPerson(person);
             if (persons.size() > prevPersonListSize) {
                 LOGGER.info("New person added successfully!");
-                return new ResultData(personDAO.findPersonById(persons.size()), "New person added successfully!", Response.Status.OK);
+                return new ResultWithNoData("New person added successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("Failed to add a new person!", Response.Status.NOT_FOUND);
             }
@@ -99,7 +99,7 @@ public class PersonResource {
     @Path("/{personId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Person> updatePerson(@PathParam("personId") int personId, Person updatePerson) {
+    public ResultWithNoData updatePerson(@PathParam("personId") int personId, Person updatePerson) {
         try {
             Person existingPerson = personDAO.findPersonById(personId);
 
@@ -107,7 +107,7 @@ public class PersonResource {
                 updatePerson.setId(personId);
                 personDAO.updatePerson(updatePerson);
                 LOGGER.info("Person with ID {} updated successfully!", personId);
-                return new ResultData(personDAO.findPersonById(personId), "Person with ID " + personId + " updated successfully!", Response.Status.OK);
+                return new ResultWithNoData("Person with ID " + personId + " updated successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("No person found with ID: " + personId, Response.Status.NOT_FOUND);
             }

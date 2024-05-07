@@ -78,14 +78,14 @@ public class DoctorResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Doctor> addDoctor(Doctor doctor) {
+    public ResultWithNoData addDoctor(Doctor doctor) {
         try {
             List<Doctor> doctors = doctorDAO.getAllDoctors();
             int prevDoctorListSize = doctors.size();
             doctorDAO.addDoctor(doctor);
             if (doctors.size() > prevDoctorListSize) {
                 LOGGER.info("New doctor added successfully!");
-                return new ResultData(doctorDAO.findDoctorById(doctors.size()), "New doctor added successfully!", Response.Status.OK);
+                return new ResultWithNoData<>("New doctor added successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("Failed to add a new doctor!", Response.Status.BAD_REQUEST);
             }
@@ -99,15 +99,15 @@ public class DoctorResource {
     @Path("/{doctorId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Doctor> updateDoctor(@PathParam("doctorId") int doctorId, Doctor updateDoctor) {
+    public ResultWithNoData updateDoctor(@PathParam("doctorId") int doctorId, Doctor updateDoctor) {
         try {
             Doctor existingDoctor = doctorDAO.findDoctorById(doctorId);
 
             if (existingDoctor != null) {
-                updateDoctor.setId(doctorId);
+                updateDoctor.setDoctorId(doctorId);
                 doctorDAO.updateDoctor(updateDoctor);
                 LOGGER.info("Doctor with ID {} updated successfully!", doctorId);
-                return new ResultData(doctorDAO.findDoctorById(doctorId), "Doctor with ID " + doctorId + " updated successfully!", Response.Status.OK);
+                return new ResultWithNoData("Doctor with ID " + doctorId + " updated successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("No doctor found with ID: " + doctorId, Response.Status.NOT_FOUND);
             }

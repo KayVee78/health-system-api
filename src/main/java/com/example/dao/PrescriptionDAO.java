@@ -75,7 +75,7 @@ public class PrescriptionDAO {
         if ((prescription.getPatientId() != null && isNumeric(prescription.getPatientId())) && (prescription.getMedication() != null && !prescription.getMedication().isEmpty() && prescription.getMedication() instanceof List)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
-                if (patient.getId() == Integer.parseInt(prescription.getPatientId())) {
+                if (patient.getPatientId() == Integer.parseInt(prescription.getPatientId())) {
                     isValidPatient = true;
                     break;
                 }
@@ -95,11 +95,11 @@ public class PrescriptionDAO {
     }
 
     public void updatePrescription(Prescription updatePrescription) {
-        if ((updatePrescription.getPatientId() != null && isNumeric(updatePrescription.getPatientId())) && (updatePrescription.getMedication() != null && !updatePrescription.getMedication().isEmpty() && updatePrescription.getMedication() instanceof List)) {
+        if ((updatePrescription.getMedication() != null && !updatePrescription.getMedication().isEmpty() && updatePrescription.getMedication() instanceof List)) {
 
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
-                if (patient.getId() == Integer.parseInt(updatePrescription.getPatientId())) {
+                if (patient.getPatientId() == Integer.parseInt(updatePrescription.getPatientId())) {
                     isValidPatient = true;
                     break;
                 }

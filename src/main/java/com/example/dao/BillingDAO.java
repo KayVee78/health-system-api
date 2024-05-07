@@ -31,11 +31,11 @@ public class BillingDAO {
     PatientDAO patietDAO = new PatientDAO();
     DoctorDAO doctorDAO = new DoctorDAO();
 
-    static {
-        bills.add(new Billing(1, 2, new Invoice("Ashan Dias (0772572800) - Channeled Doctor - Dr. Neranjan Perera (Diabetologist)", 5500, "2024-05-03"), 5500, 0));
-        bills.add(new Billing(2, 1, new Invoice("Janaka Fernando (0712359807)- Channeled Doctor - Dr. Tiran Gamlath (Cardiologist)", 6000, "2024-05-02"), 6000, 0));
-
-    }
+//    static {
+//        bills.add(new Billing(1, 2, new Invoice("Ashan Dias (0772572800) - Channeled Doctor - Dr. Neranjan Perera (Diabetologist)", 5500, "2024-05-03"), 5500, 0));
+//        bills.add(new Billing(2, 1, new Invoice("Janaka Fernando (0712359807)- Channeled Doctor - Dr. Tiran Gamlath (Cardiologist)", 6000, "2024-05-02"), 6000, 0));
+//
+//    }
 
     public List<Billing> getAllBillingData() {
         return bills;
@@ -59,8 +59,8 @@ public class BillingDAO {
                 int newBillingId = getNextBillingId();
                 Appointment appointment = appointmentDAO.findAppointmentById(bill.getAppointmentId());
 
-                Patient patient = patietDAO.findPatientById(appointment.getPatient().getId());
-                Doctor doctor = doctorDAO.findDoctorById(appointment.getDoctor().getId());
+                Patient patient = patietDAO.findPatientById(appointment.getPatient().getPatientId());
+                Doctor doctor = doctorDAO.findDoctorById(appointment.getDoctor().getDoctorId());
                 if ((patient != null) && (patient instanceof Patient) && (doctor != null) && (doctor instanceof Doctor)) {
                     String patientDetails = String.format("%s (%s) - Channeled Doctor - Dr. %s (%s)", patient.getName(), patient.getContactInfo(), doctor.getName(), doctor.getSpecialization());
                     double amountPayable = doctor.getDoctorFee() + HOSPITALCHARGES;
@@ -97,8 +97,8 @@ public class BillingDAO {
 
             if (isValidAppointmentId) {
                 Appointment appointment = appointmentDAO.findAppointmentById(updateBill.getAppointmentId());
-                Patient patient = patietDAO.findPatientById(appointment.getPatient().getId());
-                Doctor doctor = doctorDAO.findDoctorById(appointment.getDoctor().getId());
+                Patient patient = patietDAO.findPatientById(appointment.getPatient().getPatientId());
+                Doctor doctor = doctorDAO.findDoctorById(appointment.getDoctor().getDoctorId());
                 if ((patient != null) || (patient instanceof Patient) || (doctor != null) && (doctor instanceof Doctor)) {
                     String patientDetails = String.format("%s (%s) - Channeled Doctor - Dr. %s (%s)", patient.getName(), patient.getContactInfo(), doctor.getName(), doctor.getSpecialization());
                     double amountPayable = doctor.getDoctorFee() + HOSPITALCHARGES;

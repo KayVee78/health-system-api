@@ -42,16 +42,7 @@ public class ResultData<T> {
     public Status getStatus() {
         return status;
     }
-
-//    @Override
-//    public String toString() {
-//        String responseJson = "{"
-//                + "\"status\": \"" + status + "\","
-//                + "\"message\": \"" + message + "\","
-//                + "\"data\": \"" + data
-//                + "}";
-//        return responseJson;
-//    }
+    
     @Override
     public String toString() {
         
