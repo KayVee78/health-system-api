@@ -45,7 +45,7 @@ public class MedicalRecordDAO {
                     MedicalRecord formattedMedicalRecordObj = new MedicalRecord(recordId, patientDetails, medicalRecord.getReasonToVisit(), medicalRecord.getDiagnosis(), medicalRecord.getMedications(), medicalRecord.getAllergies());
                     formattedMedicalRecordList.add(formattedMedicalRecordObj);
                 } else {
-                    throw new ResourceNotFoundException("Error occurred while finding a medicsl record for patient with ID: " + patientId, Response.Status.NOT_FOUND);
+                    throw new ResourceNotFoundException("Error occurred while finding a medical record for patient with ID: " + patientId, Response.Status.NOT_FOUND);
                 }
             }
         }
@@ -76,7 +76,7 @@ public class MedicalRecordDAO {
         if ((medicalRecord.getPatientId() != null && !medicalRecord.getPatientId().isEmpty() && isNumeric(medicalRecord.getPatientId())) && (medicalRecord.getReasonToVisit() != null && !medicalRecord.getReasonToVisit().isEmpty() && medicalRecord.getReasonToVisit() instanceof String) && (medicalRecord.getDiagnosis() != null && !medicalRecord.getDiagnosis().isEmpty() && medicalRecord.getDiagnosis() instanceof String) && (medicalRecord.getMedications() != null && !medicalRecord.getMedications().isEmpty() && medicalRecord.getMedications() instanceof String) && (medicalRecord.getAllergies() != null && !medicalRecord.getAllergies().isEmpty() && medicalRecord.getAllergies() instanceof String)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
-                if (patient.getId() == Integer.parseInt(medicalRecord.getPatientId())) {
+                if (patient.getPatientId()== Integer.parseInt(medicalRecord.getPatientId())) {
                     isValidPatient = true;
                     break;
                 }
@@ -99,7 +99,7 @@ public class MedicalRecordDAO {
         if ((updateMedicalRecord.getPatientId() != null && !updateMedicalRecord.getPatientId().isEmpty() && isNumeric(updateMedicalRecord.getPatientId())) && (updateMedicalRecord.getReasonToVisit() != null && !updateMedicalRecord.getReasonToVisit().isEmpty() && updateMedicalRecord.getReasonToVisit() instanceof String) && (updateMedicalRecord.getDiagnosis() != null && !updateMedicalRecord.getDiagnosis().isEmpty() && updateMedicalRecord.getDiagnosis() instanceof String) && (updateMedicalRecord.getMedications() != null && !updateMedicalRecord.getMedications().isEmpty() && updateMedicalRecord.getMedications() instanceof String) && (updateMedicalRecord.getAllergies() != null && !updateMedicalRecord.getAllergies().isEmpty() && updateMedicalRecord.getAllergies() instanceof String)) {
             boolean isValidPatient = false;
             for (Patient patient : PatientDAO.patients) {
-                if (patient.getId() == Integer.parseInt(updateMedicalRecord.getPatientId())) {
+                if (patient.getPatientId()== Integer.parseInt(updateMedicalRecord.getPatientId())) {
                     isValidPatient = true;
                     break;
                 }

@@ -81,14 +81,14 @@ public class PatientResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Patient> addPatient(Patient patient) {
+    public ResultWithNoData addPatient(Patient patient) {
         try {
             List<Patient> patients = patientDAO.getAllPatients();
             int prevPatientListSize = patients.size();
             patientDAO.addPatient(patient);
             if (patients.size() > prevPatientListSize) {
                 LOGGER.info("New patient added successfully!");
-                return new ResultData(patientDAO.findPatientById(patients.size()), "New patient added successfully!", Response.Status.OK);
+                return new ResultWithNoData("New patient added successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("Failed to add a new patient!", Response.Status.BAD_REQUEST);
             }
@@ -102,15 +102,15 @@ public class PatientResource {
     @Path("/{patientId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Patient> updatePatient(@PathParam("patientId") int patientId, Patient updatePatient) {
+    public ResultWithNoData updatePatient(@PathParam("patientId") int patientId, Patient updatePatient) {
         try {
             Patient existingPatient = patientDAO.findPatientById(patientId);
 
             if (existingPatient != null) {
-                updatePatient.setId(patientId);
+                updatePatient.setPatientId(patientId);
                 patientDAO.updatePatient(updatePatient);
                 LOGGER.info("Patient with ID {} updated successfully!", patientId);
-                return new ResultData(patientDAO.findPatientById(patientId), "Patient with ID " + patientId + " updated successfully!", Response.Status.OK);
+                return new ResultWithNoData("Patient with ID " + patientId + " updated successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("No patient found with ID: " + patientId, Response.Status.NOT_FOUND);
             }

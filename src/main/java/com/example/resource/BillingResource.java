@@ -98,14 +98,14 @@ public class BillingResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Billing> addBilling(Billing bill) {
+    public ResultWithNoData addBilling(Billing bill) {
         try {
             List<Billing> bills = billingDAO.getNonModifiedBillingList();
             int prevBillingListSize = bills.size();
             billingDAO.addBillingData(bill);
             if (bills.size() > prevBillingListSize) {
                 LOGGER.info("New bill added successfully!");
-                return new ResultData(billingDAO.findBillingDataById(bills.size()), "New bill added successfully!", Response.Status.OK);
+                return new ResultWithNoData("New bill added successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("Failed to add a new bill!", Response.Status.BAD_REQUEST);
             }
@@ -119,7 +119,7 @@ public class BillingResource {
     @Path("/{billId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Billing> updateBilling(@PathParam("billId") int billId, Billing updateBilling) {
+    public ResultWithNoData updateBilling(@PathParam("billId") int billId, Billing updateBilling) {
         try {
             Billing existingBilling = billingDAO.findBillingDataById(billId);
 
@@ -127,7 +127,7 @@ public class BillingResource {
                 updateBilling.setBillingId(billId);
                 billingDAO.updateBillingData(updateBilling);
                 LOGGER.info("Bill with ID {} updated successfully!", billId);
-                return new ResultData(billingDAO.findBillingDataById(billId), "Bill with ID " + billId + " updated successfully!", Response.Status.OK);
+                return new ResultWithNoData("Bill with ID " + billId + " updated successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("No bill found with ID: " + billId, Response.Status.NOT_FOUND);
             }

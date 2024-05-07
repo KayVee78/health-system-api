@@ -102,7 +102,7 @@ public class PrescriptionResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Prescription> addPrescription(Prescription prescription) {
+    public ResultWithNoData addPrescription(Prescription prescription) {
         try {
             List<Prescription> prescriptions = prescriptionDAO.getAllPrescriptions();
             int prevPrescriptionListSize = prescriptions.size();
@@ -110,7 +110,7 @@ public class PrescriptionResource {
             prescriptions = prescriptionDAO.getAllPrescriptions();
             if (prescriptions.size() > prevPrescriptionListSize) {
                 LOGGER.info("New prescription added successfully!");
-                return new ResultData(prescriptionDAO.findPrescriptionById(prescriptions.size()), "New prescription added successfully!", Response.Status.OK);
+                return new ResultWithNoData("New prescription added successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("Failed to add a new prescription!", Response.Status.BAD_REQUEST);
             }
@@ -124,7 +124,7 @@ public class PrescriptionResource {
     @Path("/{prescriptionId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<Prescription> updatePrescription(@PathParam("prescriptionId") int prescriptionId, Prescription updatePrescription) {
+    public ResultWithNoData updatePrescription(@PathParam("prescriptionId") int prescriptionId, Prescription updatePrescription) {
         try {
             Prescription existingPrescription = prescriptionDAO.findPrescriptionById(prescriptionId);
 
@@ -132,7 +132,7 @@ public class PrescriptionResource {
                 updatePrescription.setPrescriptionId(prescriptionId);
                 prescriptionDAO.updatePrescription(updatePrescription);
                 LOGGER.info("Prescription with ID {} updated successfully!", prescriptionId);
-                return new ResultData(prescriptionDAO.findPrescriptionById(prescriptionId), "Prescription with ID " + prescriptionId + " updated successfully!", Response.Status.OK);
+                return new ResultWithNoData("Prescription with ID " + prescriptionId + " updated successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("No prescription found with ID: " + prescriptionId, Response.Status.NOT_FOUND);
             }

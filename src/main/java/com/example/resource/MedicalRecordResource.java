@@ -105,7 +105,7 @@ public class MedicalRecordResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<MedicalRecord> addMedicalRecord(MedicalRecord medicalRecord) {
+    public ResultWithNoData addMedicalRecord(MedicalRecord medicalRecord) {
         try {
             List<MedicalRecord> medicalRecords = medicalRecordDAO.getAllMedicalRecords();
             int prevMedicalRecordListSize = medicalRecords.size();
@@ -113,7 +113,7 @@ public class MedicalRecordResource {
             medicalRecords = medicalRecordDAO.getAllMedicalRecords();
             if (medicalRecords.size() > prevMedicalRecordListSize) {
                 LOGGER.info("New medical record added successfully!");
-                return new ResultData(medicalRecordDAO.getMedicalRecordById(medicalRecords.size()), "New medical record added successfully!", Response.Status.OK);
+                return new ResultWithNoData("New medical record added successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("Failed to add a new medical record!", Response.Status.BAD_REQUEST);
             }
@@ -127,7 +127,7 @@ public class MedicalRecordResource {
     @Path("/{medicalRecordId}")
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public ResultData<MedicalRecord> updateMedicalRecord(@PathParam("medicalRecordId") int medicalRecordId, MedicalRecord updateMedicalRecord) {
+    public ResultWithNoData updateMedicalRecord(@PathParam("medicalRecordId") int medicalRecordId, MedicalRecord updateMedicalRecord) {
         try {
             MedicalRecord existingMedicalRecord = medicalRecordDAO.findMedicalRecordById(medicalRecordId);
 
@@ -135,7 +135,7 @@ public class MedicalRecordResource {
                 updateMedicalRecord.setRecordId(medicalRecordId);
                 medicalRecordDAO.updateMedicalRecord(updateMedicalRecord);
                 LOGGER.info("Medical record with ID {} updated successfully!", medicalRecordId);
-                return new ResultData(medicalRecordDAO.getMedicalRecordById(medicalRecordId), "Medical record with ID " + medicalRecordId + " updated successfully!", Response.Status.OK);
+                return new ResultWithNoData("Medical record with ID " + medicalRecordId + " updated successfully!", Response.Status.OK);
             } else {
                 throw new ResourceNotFoundException("No medical record found with ID: " + medicalRecordId, Response.Status.NOT_FOUND);
             }
